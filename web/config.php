@@ -1,0 +1,73 @@
+<?php
+// config.php
+return [
+  'app' => [
+    'mon_refresh_seconds' => 20,    // refresh interval monitoring UI in seconds
+    'stat_refresh_seconds' => 40,    // refresh interval status UI in seconds
+    'timezone' => 'Europe/Amsterdam',
+    'default_device' => 'RaspiServ3', // default device in monitoring UI
+    'default_minutes' => 10080, // default time window monitoring UI in minutes
+  ],
+
+  // Database settings
+  'db' => [
+    'host' => 'localhost',
+    'port' => 3306,
+    'dbname' => 'rpimonitor',
+    'user' => 'rpimon_reader',
+    'pass' => 'VULLEZERPASSWORDIN',
+    'charset' => 'utf8mb4',
+  ],
+
+  // Global display defaults
+  'defaults' => [
+    'decimals' => 1,
+    'thresholds' => [  // colors for default thresholds
+      ['upto' => 70, 'color' => '#2ecc71'], // green
+      ['upto' => 90, 'color' => '#f1c40f'], // yellow
+      ['color' => '#e74c3c'],               // red
+    ],
+  ],
+
+  // Sections & cards
+  'sections' => [
+    [
+      'title' => 'System',
+      'columns' => 3, // columns in grid
+      'cards' => [
+        [
+          'metric_key' => 'RaspiServ3.cpu.load15',
+          'type'       => 'gauge',     // text | progress | gauge | line
+          'label'      => '15 minuutjes ',
+          'unit'       => 'procentjes',
+          'min'        => 0,
+          'max'        => 1,
+          'decimals'   => 1,
+          'thresholds' => [
+            ['upto' => .60, 'color' => '#2ecc71'],
+            ['upto' => .80, 'color' => '#f39c12'],
+            ['color' => '#e74c3c'],
+          ],
+        ],
+        [
+          'metric_key' => 'RaspiServ3.cpu.usage_pct',
+          'type'       => 'progress',
+          'label'      => 'CPU Gebruik',
+          'unit'       => '%',
+          'min'        => 0,
+          'max'        => 100,
+          'decimals'   => 0,
+        ],
+        [
+          'metric_key' => 'RaspiServ3.cpu.load1',
+          'type'       => 'progress',
+          'label'      => 'RAM Gebruik',
+          'unit'       => '%',
+          'min'        => 0,
+          'max'        => 100,
+          'decimals'   => 0,
+        ],
+      ],
+    ],
+  ],
+];
