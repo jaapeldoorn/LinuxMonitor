@@ -22,10 +22,7 @@ import mysql.connector as mysql
 from mysql.connector import errorcode
 from typing import Dict, List, Tuple
 from systemd import journal
-import psutil  # psutil voor CPU/mem/disk/net
 import subprocess
-
-Metric = Tuple[str, str, str, str, float]
 
 # --------------------------- Logging ---------------------------------
 
@@ -37,22 +34,10 @@ class JournalHandler(logging.Handler):
             SYSLOG_IDENTIFIER='LinuxMonitor'
         )
 
-#logger = logging.getLogger("rpimonitor")
-#logging.basicConfig(
-##	format='%(asctime)s [%(levelname)s] %(message)s',
-#        filename='/etc/LinuxMonitor/daemon/app.log',           # Naam van het logbestand
-#        filemode='a',                 # 'a' voor aanvullen, 'w' voor overschrijven
-#        format='%(asctime)s - %(levelname)s - %(message)s',
-#        level=logging.INFO            # Of DEBUG, WARNING, ERROR, CRITICAL
-#)
-
 # --------------------------- Helpers ---------------------------------
 
 def now_ts():
     return dt.datetime.now(dt.timezone.utc)
-
-# Cache voor netwerk byte-tellers om throughput te berekenen
-_prev_net_bytes: Dict[str, Tuple[int, int]] = {}
 
 # --------------------------- DB Layer --------------------------------
 

@@ -1,0 +1,14 @@
+
+# LinuxMonitor daemon configuration
+interval_seconds: 60            # sample-interval
+retention_days: 31              # oude records opruimen (NULL = uit)
+
+mysql:
+  host: localhost
+  port: 3306
+  database: linuxmonitor
+  user: linmon_writer
+  password: WriteIq97oBgNApf3Mj
+
+# Host label (to distingish between servers)
+host_label: "RaspiServ3"
