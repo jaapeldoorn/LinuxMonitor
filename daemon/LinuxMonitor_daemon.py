@@ -22,8 +22,6 @@ import mysql.connector as mysql
 from mysql.connector import errorcode
 from typing import Dict, List, Tuple
 from systemd import journal
-import sys
-import traceback
 import psutil  # psutil voor CPU/mem/disk/net
 import subprocess
 
