@@ -1,1 +1,33 @@
-/etc/systemd/system/linuxmonitor.service
+
+[Unit]
+Description=LinuxMonitor - Python Daemon
+After=network-online.target mysql.service mariadb.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+Group=root
+WorkingDirectory=/etc/LinuxMonitor/daemon
+#ExecStart=/bin/bash -c 'exec -a LinuxMonitor /etc/LinuxMonitor/daemon/.venv/bin/python /etc/LinuxMonitor/daemon/LinuxMonitor_daemon.py --config /etc/LinuxMonitor/daemon/config.yaml'
+#ExecStart=exec -a "LinuxMonitor" /etc/LinuxMonitor/daemon/.venv/bin/python /etc/LinuxMonitor/daemon/LinuxMonitor_daemon.py --config /etc/LinuxMonitor/daemon/config.yaml
+#ExecStart=/etc/LinuxMonitor/daemon/.venv/bin/python /etc/LinuxMonitor/daemon/LinuxMonitor_daemon.py --config /etc/LinuxMonitor/daemon/config.yaml
+ExecStart=/etc/LinuxMonitor/daemon/LinuxMonitor.sh
+Environment="PATH=/etc/LinuxMonitor/daemon/.venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+Environment="PYTHONPATH=/etc/LinuxMonitor/daemon/.venv/lib/python3.13/site-packages"
+Environment="VIRTUAL_ENV=/etc/LinuxMonitor/daemon/.venv"
+Environment=PYTHONUNBUFFERED=1
+Restart=on-failure
+RestartSec=5
+
+# Hardening (pas aan naar wens)
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=off
+ProtectHome=true
+
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
