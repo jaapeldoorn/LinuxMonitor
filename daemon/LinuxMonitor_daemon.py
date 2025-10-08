@@ -21,21 +21,31 @@ import re                              # regex
 import mysql.connector as mysql
 from mysql.connector import errorcode
 from typing import Dict, List, Tuple
+from systemd import journal
 
-import psutil  # psutil voor CPU/mem/disk/net  
+import psutil  # psutil voor CPU/mem/disk/net
 import subprocess
 
 Metric = Tuple[str, str, str, str, float]
 
 # --------------------------- Logging ---------------------------------
-logger = logging.getLogger("rpimonitor")
-logging.basicConfig(
-#	format='%(asctime)s [%(levelname)s] %(message)s',
-        filename='/etc/LinuxMonitor/daemon/app.log',           # Naam van het logbestand
-        filemode='a',                 # 'a' voor aanvullen, 'w' voor overschrijven
-        format='%(asctime)s - %(levelname)s - %(message)s',
-        level=logging.INFO            # Of DEBUG, WARNING, ERROR, CRITICAL
-)
+
+class JournalHandler(logging.Handler):
+    def emit(self, record):
+        journal.send(
+            record.getMessage(),
+            PRIORITY=record.levelno,
+            SYSLOG_IDENTIFIER='LinuxMonitor'
+        )
+
+#logger = logging.getLogger("rpimonitor")
+#logging.basicConfig(
+##	format='%(asctime)s [%(levelname)s] %(message)s',
+#        filename='/etc/LinuxMonitor/daemon/app.log',           # Naam van het logbestand
+#        filemode='a',                 # 'a' voor aanvullen, 'w' voor overschrijven
+#        format='%(asctime)s - %(levelname)s - %(message)s',
+#        level=logging.INFO            # Of DEBUG, WARNING, ERROR, CRITICAL
+#)
 
 # --------------------------- Helpers ---------------------------------
 
@@ -102,7 +112,19 @@ PLUGINS = []
 
 
 def main():
-    logging.info("LinuxMonitor daemon starting")
+
+
+    # Stel logging in
+    logger = logging.getLogger('journal_logger')
+    logger.setLevel(logging.INFO)
+    logger.addHandler(JournalHandler())
+
+    # Voorbeeldlog
+    logger.info("Dit is een info-log naar het systemd journal.")
+    logger.error("Dit is een foutmelding naar het journal.")
+
+
+    #logging.info("LinuxMonitor daemon starting")
 
     # Get config
     parser = argparse.ArgumentParser()
@@ -119,7 +141,7 @@ def main():
     interval = int(cfg.get('interval_seconds', 5))
     retention_days = cfg.get('retention_days', 30)
 
-    logger.info("LinuxMonitor daemon started (interval=%ss, host_label=%s)", interval, cfg['host_label'])
+    #logger.info("LinuxMonitor daemon started (interval=%ss, host_label=%s)", interval, cfg['host_label'])
 
     last_purge = 0.0
     PURGE_EVERY = 3600.0  # elk uur

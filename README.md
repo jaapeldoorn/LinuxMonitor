@@ -8,7 +8,7 @@ LinuxMonitor consists of 3 components:
 
 Please let me know in case you see some bugs!
 
-jaapeldoorn
+jaapeldoorn.
 
 # Installation
 
