@@ -5,7 +5,7 @@ return [
     'mon_refresh_seconds' => 20,    // refresh interval monitoring UI in seconds
     'stat_refresh_seconds' => 40,    // refresh interval status UI in seconds
     'timezone' => 'Europe/Amsterdam',
-    'default_device' => 'RaspiServ3', // default device in monitoring UI
+    'default_device' => 'System1', // default device in monitoring UI
     'default_minutes' => 10080, // default time window monitoring UI in minutes
   ],
 
@@ -13,9 +13,9 @@ return [
   'db' => [
     'host' => 'localhost',
     'port' => 3306,
-    'dbname' => 'rpimonitor',
-    'user' => 'rpimon_reader',
-    'pass' => 'VULLEZERPASSWORDIN',
+    'dbname' => 'linuxmonitor',
+    'user' => 'linmon_reader',
+    'pass' => 'READerdg453rg43sg',
     'charset' => 'utf8mb4',
   ],
 
@@ -36,10 +36,10 @@ return [
       'columns' => 3, // columns in grid
       'cards' => [
         [
-          'metric_key' => 'RaspiServ3.cpu.load15',
+          'metric_key' => 'System1.cpu.load15',
           'type'       => 'gauge',     // text | progress | gauge | line
-          'label'      => '15 minuutjes ',
-          'unit'       => 'procentjes',
+          'label'      => 'Label1',
+          'unit'       => 'Unit1',
           'min'        => 0,
           'max'        => 1,
           'decimals'   => 1,
@@ -50,19 +50,19 @@ return [
           ],
         ],
         [
-          'metric_key' => 'RaspiServ3.cpu.usage_pct',
+          'metric_key' => 'System1.cpu.load5',
           'type'       => 'progress',
-          'label'      => 'CPU Gebruik',
-          'unit'       => '%',
+          'label'      => 'Label2',
+          'unit'       => 'Unit2',
           'min'        => 0,
           'max'        => 100,
           'decimals'   => 0,
         ],
         [
-          'metric_key' => 'RaspiServ3.cpu.load1',
+          'metric_key' => 'System1.cpu.load1',
           'type'       => 'progress',
-          'label'      => 'RAM Gebruik',
-          'unit'       => '%',
+          'label'      => 'Label3',
+          'unit'       => 'Unit3',
           'min'        => 0,
           'max'        => 100,
           'decimals'   => 0,
