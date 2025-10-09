@@ -14,7 +14,7 @@ jaapeldoorn.
 
 ## Database (MySQL/MariaDB)
 Login as root user in MySQL/MariaDB.
-Create users and grant rights to the users (change password to own passwords:
+Create users and grant rights to the users (change password to own passwords and use them later in de daemon and webdashboard config files):
 ```SQL
 CREATE DATABASE linuxmonitor CHARACTER SET utf8mb4;
 CREATE USER 'linmon_writer'@'localhost' IDENTIFIED BY 'WRITE31f34ert4ggs';
@@ -46,6 +46,21 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
+Configure the daemon:
+```bash
+sudo cp /etc/LinuxMonitor/daemon/config.yaml.orig /etc/LinuxMonitor/daemon/config.yaml
+sudo nano /etc/LinuxMonitor/config.yaml
+```
+
+Start the service:
+```bash
+sudo cp /etc/LinuxMonitor/daemon/linuxmonitor.service /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable linuxmonitor
+sudo systemctl start linuxmonitor
+sudo systemctl status linuxmonitor
+```
+
 ## PHP webdashboard
 Install Apache2 in case no webserver is installed:
 ```bash
@@ -56,12 +71,35 @@ Install required package:
 ```bash
 sudo apt install -y php php-mysql
 ```
+
+Configure webdashboard:
+```bash
+sudo cp /etc/LinuxMonitor/web/config.php.orig /etc/LinuxMonitor/web/config.php
+sudo nano /etc/LinuxMonitor/web/config.php
+```
+
 Create virtual link to webfiles and assign correct rights:
 ```bash
 sudo ln -s /etc/LinuxMonitor/web /var/www/html/linuxmonitor
 sudo chown www-data:www-data /var/www/html/linuxmonitor
 ```
+
 Make sure webserver will follow Simlinks. Apache2 Virtual host config file should contain `Options FollowSymLinks`. Reload Apache2 configfiles with `sudo service apache2 reload` in case configuration has been changed.
+Example Apache2 config file (/etc/apach2/sites-enabled/default.conf:
+```
+<VirtualHost *:80>
+        ServerName dummy.com
+        ServerAlias www.dummy.com
+        DocumentRoot /var/www/html
+
+        ServerAdmin admin@dummy.com
+
+        ErrorLog ${APACHE_LOG_DIR}/error.log
+        CustomLog ${APACHE_LOG_DIR}/access.log combined
+
+        Options FollowSymLinks
+</VirtualHost>
+```
 
 #System Requirements
 - Linux host
