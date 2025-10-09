@@ -96,11 +96,18 @@ PLUGINS = []
 
 
 def main():
+    # Get config
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--config', default='config.yaml', help='Pad naar configuratiebestand')
+    args = parser.parse_args()
+    with open(args.config, 'r') as f:
+        cfg = yaml.safe_load(f)
 
-
-    # Stel logging in
+    # Set logging level based on config value
     logger = logging.getLogger('journal_logger')
-    logger.setLevel(logging.INFO)
+    log_level_str = cfg.get('log_level', 'INFO').upper()
+    log_level = getattr(logging, log_level_str, logging.INFO)
+    logger.setLevel(log_level)
     logger.addHandler(JournalHandler())
 
     # Voorbeeldlog
@@ -109,13 +116,6 @@ def main():
 
 
     #logging.info("LinuxMonitor daemon starting")
-
-    # Get config
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--config', default='config.yaml', help='Pad naar configuratiebestand')
-    args = parser.parse_args()
-    with open(args.config, 'r') as f:
-        cfg = yaml.safe_load(f)
 
     # Get host_label
     cfg.setdefault('host_label', socket.gethostname())
