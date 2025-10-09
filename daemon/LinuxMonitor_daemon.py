@@ -134,6 +134,7 @@ def main():
         if (time.time() - last_purge) > PURGE_EVERY:
             try:
                 #db.purge_old(retention_days)
+                logging.debug("No retention performed.")
             except Exception as e:
                 logging.exception("Fout bij retentie-opruiming: %s", e)
             last_purge = time.time()
