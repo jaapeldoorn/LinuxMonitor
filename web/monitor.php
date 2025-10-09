@@ -34,7 +34,7 @@ foreach ($viewable_metrics as $metric) {
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Linux Monitor - Server monitor</title>
-  <link rel="icon" href="favicon.png">
+  <link rel="icon" href="favicon.ico">
   <link rel="stylesheet" href="style.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/luxon@3"></script>
