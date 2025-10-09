@@ -5,24 +5,23 @@ LinuxMonitor daemon
 
 - Collects system statistics as configured MySQL table Metrics
 - Stores configured statistics in MySQL table Metrics
-
-TODO - Periodieke retentie-opruiming
+- Periodic retention cleanup
 """
 
 # --------------------------- Imports ---------------------------------
-import os
+#import os
 import time                            # current date/time
 import datetime as dt                  # date formats
 import logging                         # logging
 import yaml                            # YAML-config
 import argparse                        # parsing command line arguments
-import socket
+import socket                          # retrieval of hostname
 import re                              # regex
-import mysql.connector as mysql
-from mysql.connector import errorcode
-from typing import Dict, List, Tuple
-from systemd import journal
-import subprocess
+import mysql.connector as mysql        # DB connection
+from mysql.connector import errorcode  # SQL error codes
+from typing import Dict, List, Tuple   # variable structures
+from systemd import journal            # logging to journal
+import subprocess                      # execution of commands
 
 # --------------------------- Logging ---------------------------------
 
@@ -58,18 +57,18 @@ class DB:
             autocommit=True,
         )
 
-    def ensure_metric(self, key: str, name: str, unit: str, description: str) -> int:
-        self.connect()
-        cur = self.conn.cursor()
-        cur.execute("SELECT id FROM metrics WHERE `key`=%s", (key,))
-        row = cur.fetchone()
-        if row:
-            cur.close()
-            return row[0]
-        cur.execute("INSERT INTO metrics(`key`, name, unit, description) VALUES(%s,%s,%s,%s)", (key, name, unit, description))
-        metric_id = cur.lastrowid
-        cur.close()
-        return metric_id
+    #def ensure_metric(self, key: str, name: str, unit: str, description: str) -> int:
+    #    self.connect()
+    #    cur = self.conn.cursor()
+    #    cur.execute("SELECT id FROM metrics WHERE `key`=%s", (key,))
+    #    row = cur.fetchone()
+    #    if row:
+    #        cur.close()
+    #        return row[0]
+    #    cur.execute("INSERT INTO metrics(`key`, name, unit, description) VALUES(%s,%s,%s,%s)", (key, name, unit, description))
+    #    metric_id = cur.lastrowid
+    #    cur.close()
+    #    return metric_id
 
     def insert_samples(self, rows: List[Tuple[int, dt.datetime, float]]):
         if not rows:
@@ -88,7 +87,7 @@ class DB:
         deleted = cur.rowcount
         cur.close()
         if deleted:
-            logger.info("Retentie: %d oude samples verwijderd", deleted)
+            logging.info("Retention: %d old samples removed", deleted)
 
 # --------------------------- Main loop --------------------------------
 
@@ -98,7 +97,7 @@ PLUGINS = []
 def main():
     # Get config
     parser = argparse.ArgumentParser()
-    parser.add_argument('--config', default='config.yaml', help='Pad naar configuratiebestand')
+    parser.add_argument('--config', default='config.yaml', help='Path to configuration file')
     args = parser.parse_args()
     with open(args.config, 'r') as f:
         cfg = yaml.safe_load(f)
@@ -110,12 +109,7 @@ def main():
     logger.setLevel(log_level)
     logger.addHandler(JournalHandler())
 
-    # Voorbeeldlog
-    logger.info("Dit is een info-log naar het systemd journal.")
-    logger.error("Dit is een foutmelding naar het journal.")
-
-
-    #logging.info("LinuxMonitor daemon starting")
+    logging.info("LinuxMonitor daemon starting")
 
     # Get host_label
     cfg.setdefault('host_label', socket.gethostname())
@@ -125,65 +119,56 @@ def main():
     interval = int(cfg.get('interval_seconds', 5))
     retention_days = cfg.get('retention_days', 30)
 
-    #logger.info("LinuxMonitor daemon started (interval=%ss, host_label=%s)", interval, cfg['host_label'])
+    logging.debug("LinuxMonitor daemon started (interval=%ss, host_label=%s)", interval, cfg['host_label'])
 
     last_purge = 0.0
-    PURGE_EVERY = 3600.0  # elk uur
+    PURGE_EVERY = 3600.0  # every hour
 
     sampling_cycle = 1
 
-    # Voorbeeldlogberichten
-    #logging.debug("Dit is een debugbericht")
-    #logging.info("Dit is een infobericht")
-    #logging.warning("Dit is een waarschuwing")
-    #logging.error("Dit is een foutmelding")
-    #logging.critical("Dit is een kritieke fout")
-
-
     while True:
-        logger.info("Samping cycle " + str(sampling_cycle) + " started")
+        logging.info("Samping cycle " + str(sampling_cycle) + " started")
         start = time.time()
 
-        # Retentie periodiek
+        # Retention period
         if (time.time() - last_purge) > PURGE_EVERY:
             try:
-                db.purge_old(retention_days)
+                #db.purge_old(retention_days)
             except Exception as e:
-                logger.exception("Fout bij retentie-opruiming: %s", e)
+                logging.exception("Fout bij retentie-opruiming: %s", e)
             last_purge = time.time()
 
-
-        # Verwerk metrics met run=1 vóór de slaapcyclus
+        # Proces metrics with run=1 in database
         try:
             db.connect()
             cur = db.conn.cursor(dictionary=True)
             cur.execute("SELECT id, run, command, regex, frequency FROM metrics WHERE run=1")
             run_metrics = cur.fetchall()
             cur.close()
-            logger.info(str(run_metrics))
+            logging.info(str(run_metrics))
             for m in run_metrics:
                 try:
                     if sampling_cycle % m['frequency'] == 0:
-                        #logger.info("Attempt to run command: " + str(m['command'] ))
+                        #logging.debug("Attempt to run command: " + str(m['command'] ))
                         output = subprocess.check_output(str(m['command']), shell=True, text=True, stderr=subprocess.DEVNULL, timeout=5).strip()
-                        #logger.info("Output: "+str(output))
-                        #logger.info("Applying regex: " + str(m['regex'] ))
+                        #logging.debug("Output: "+str(output))
+                        #logging.debug("Applying regex: " + str(m['regex'] ))
                         match = re.search(m['regex'], output)
                         if match:
                             value = float(match.group(1))
                             insert_cur = db.conn.cursor()
                             insert_cur.execute("INSERT INTO samples(metric_id, ts, value) VALUES (%s, %s, %s)", (m['id'], now_ts(), value))
                             insert_cur.close()
-                            logger.info(f"Run-metric {m['id']} verwerkt met waarde {value}")
+                            logging.info(f"Run-metric {m['id']} processed with value {value}")
                         else:
-                            logger.warning(f"Geen match voor regex '{m['regex']}' op output: {output}")
+                            logging.warning(f"No match voor regex '{m['regex']}' on output: {output}")
                 except Exception as e:
-                    logger.exception(f"Fout bij uitvoeren van run-metric {m['id']}: {e}")
+                    logging.exception(f"Error during excecution of run-metric {m['id']}: {e}")
         except Exception as e:
-            logger.exception(f"Fout bij ophalen/verwerken van run-metrics: {e}")
+            logging.exception(f"Error during processing of run-metrics: {e}")
 
 
-        # Slaap tot volgende cyclus
+        # Sleep unitl next cyclus
         elapsed = time.time() - start
         sleep_for = max(0.0, interval - elapsed)
         time.sleep(sleep_for)
