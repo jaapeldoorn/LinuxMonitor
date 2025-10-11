@@ -1,0 +1,24 @@
+
+-- Database scheme for first install of LinuxMonitor
+CREATE TABLE IF NOT EXISTS metrics (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  keystr VARCHAR(128) NOT NULL UNIQUE,
+  name VARCHAR(255) NOT NULL,
+  unit VARCHAR(64) NULL,
+  description TEXT NULL
+  command VARCHAR(200) NOT NULL,
+  regex VARCHAR(200) NOT NULL,
+  modification TINYINT UNSIGNED DEFAULT '0',
+  run TINYINT NOT NULL UNSIGNED DEFAULT '1',
+  view TINYINT NOT NULL UNSIGNED DEFAULT '0',
+  frequency TINYINT NOT NULL UNSIGNED DEFAULT '1',
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS samples (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  metric_id INT NOT NULL,
+  ts DATETIME(6) NOT NULL,
+  value DOUBLE NOT NULL,
+  INDEX idx_metric_ts (metric_id, ts),
+  CONSTRAINT fk_samples_metric FOREIGN KEY (metric_id) REFERENCES metrics(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
