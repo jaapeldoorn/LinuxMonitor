@@ -122,7 +122,7 @@ def main():
     logging.debug("LinuxMonitor daemon started (interval=%ss, host_label=%s)", interval, cfg['host_label'])
 
     last_purge = 0.0
-    PURGE_EVERY = 3600.0  # every hour
+    PURGE_EVERY = 3600.0  # every hour TODO
 
     sampling_cycle = 1
 
@@ -143,7 +143,7 @@ def main():
         try:
             db.connect()
             cur = db.conn.cursor(dictionary=True)
-            cur.execute("SELECT id, run, command, regex, frequency FROM metrics WHERE run=1")
+            cur.execute("SELECT id, run, command, regex, frequency, modification FROM metrics WHERE run=1")
             run_metrics = cur.fetchall()
             cur.close()
             logging.info(str(run_metrics))
@@ -154,9 +154,27 @@ def main():
                         output = subprocess.check_output(str(m['command']), shell=True, text=True, stderr=subprocess.DEVNULL, timeout=5).strip()
                         #logging.debug("Output: "+str(output))
                         #logging.debug("Applying regex: " + str(m['regex'] ))
-                        match = re.search(m['regex'], output)
-                        if match:
-                            value = float(match.group(1))
+                        re_result = re.search(m['regex'], output)
+                        if re_result:
+                            value = float(re_result.group(1))
+                            logging.info(f"Current modification is {m['modification']} for run-metric {m['id']}")
+                            match m['modification']:
+                                case None:
+                                    pass
+                                case 0:
+                                    pass
+                                case 1: #Convert from sec to hour
+                                    try:
+                                        value = value / 3600
+                                    except Exception as e:
+                                        logging.exception(f"Error during conversion type {m['modification']} with original value {value}")
+                                case 2: #Divide by 1000
+                                    try:
+                                        value = value / 1000
+                                    except Exception as e:
+                                        logging.exception(f"Error during conversion type {m['modification']} with original value {value}")
+                                case _:
+                                    logging.exception(f"Error during excecution of run-metric {m['id']}: {e}")
                             insert_cur = db.conn.cursor()
                             insert_cur.execute("INSERT INTO samples(metric_id, ts, value) VALUES (%s, %s, %s)", (m['id'], now_ts(), value))
                             insert_cur.close()
