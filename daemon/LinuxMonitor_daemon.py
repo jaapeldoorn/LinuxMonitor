@@ -142,34 +142,45 @@ def main():
                         #logger.debug("Applying regex: " + str(m['regex'] ))
                         re_result = re.search(m['regex'], output)
                         if re_result:
-                            value = float(re_result.group(1))
+                            #value = float(re_result.group(1))
                             #logger.debug(f"Current modification is {m['modification']} for run-metric {m['id']}")
                             match m['modification']:
                                 case None:
-                                    pass
+                                    value = float(re_result.group(1))
                                 case 0:
-                                    pass
+                                    value = float(re_result.group(1))
                                 case 1: #Convert from sec to hour
                                     try:
-                                        value = value / 3600
+                                        value = float(re_result.group(1)) / 3600
                                     except Exception as e:
                                         logger.exception(f"Error during conversion type {m['modification']} with original value {value}")
                                 case 2: #Divide by 1000
                                     try:
-                                        value = value / 1000
+                                        value = float(re_result.group(1)) / 1000
                                     except Exception as e:
                                         logger.exception(f"Error during conversion type {m['modification']} with original value {value}")
                                 case 3: #Divide by 1024
                                     try:
-                                        value = value / 1024
+                                        value = float(re_result.group(1)) / 1024
+                                    except Exception as e:
+                                        logger.exception(f"Error during conversion type {m['modification']} with original value {value}")
+                                case 99: #Proces a string
+                                    try:
+                                        value = re_result.group(1)
                                     except Exception as e:
                                         logger.exception(f"Error during conversion type {m['modification']} with original value {value}")
                                 case _:
                                     logger.exception(f"Error during excecution of run-metric {m['id']}: {e}")
-                            insert_cur = db.conn.cursor()
-                            insert_cur.execute("INSERT INTO samples(metric_id, ts, value) VALUES (%s, %s, %s)", (m['id'], now_ts(), value))
-                            insert_cur.close()
-                            logger.info(f"Run-metric {m['id']} processed with value {value}")
+                            if m['modification']==99:
+                                insert_cur = db.conn.cursor()
+                                insert_cur.execute("INSERT INTO `txt-status`(metric_id, ts, string) VALUES (%s, %s, %s) ON DUPLICATE KEY UPDATE metric_id = %s, ts = %s, string = %s", (m['id'], now_ts(), value, m['id'], now_ts(), value))
+                                insert_cur.close()
+                                logger.debug(f"Run-metric {m['id']} processed with text {value}")
+                            else:
+                                insert_cur = db.conn.cursor()
+                                insert_cur.execute("INSERT INTO samples(metric_id, ts, value) VALUES (%s, %s, %s)", (m['id'], now_ts(), value))
+                                insert_cur.close()
+                                #logger.debug(f"Run-metric {m['id']} processed with value {value}")
                         else:
                             logger.warning(f"No match voor regex '{m['regex']}' on output: {output}")
                 except Exception as e:
