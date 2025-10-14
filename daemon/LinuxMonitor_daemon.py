@@ -87,7 +87,7 @@ class DB:
         deleted = cur.rowcount
         cur.close()
         if deleted:
-            logging.info("Retention: %d old samples removed", deleted)
+            logger.info("Retention: %d old samples removed", deleted)
 
 # --------------------------- Main loop --------------------------------
 
@@ -109,17 +109,16 @@ def main():
     logger.setLevel(log_level)
     logger.addHandler(JournalHandler())
 
-    logging.info("LinuxMonitor daemon starting")
+    logger.info("LinuxMonitor daemon starting")
 
     # Get host_label
     cfg.setdefault('host_label', socket.gethostname())
-
 
     db = DB(cfg)
     interval = int(cfg.get('interval_seconds', 5))
     retention_days = cfg.get('retention_days', 30)
 
-    logging.debug("LinuxMonitor daemon started (interval=%ss, host_label=%s)", interval, cfg['host_label'])
+    logger.debug("LinuxMonitor daemon started (interval=%ss, host_label=%s)", interval, cfg['host_label'])
 
     last_purge = 0.0
     PURGE_EVERY = 3600.0  # every hour TODO
@@ -127,16 +126,16 @@ def main():
     sampling_cycle = 1
 
     while True:
-        logging.info("Samping cycle " + str(sampling_cycle) + " started")
+        logger.info("Samping cycle " + str(sampling_cycle) + " started")
         start = time.time()
 
         # Retention period
         if (time.time() - last_purge) > PURGE_EVERY:
             try:
                 #db.purge_old(retention_days)
-                logging.debug("No retention performed.")
+                logger.debug("No retention performed.")
             except Exception as e:
-                logging.exception("Fout bij retentie-opruiming: %s", e)
+                logger.exception("Fout bij retentie-opruiming: %s", e)
             last_purge = time.time()
 
         # Proces metrics with run=1 in database
@@ -146,18 +145,18 @@ def main():
             cur.execute("SELECT id, run, command, regex, frequency, modification FROM metrics WHERE run=1")
             run_metrics = cur.fetchall()
             cur.close()
-            logging.info(str(run_metrics))
+            #logger.debug(str(run_metrics))
             for m in run_metrics:
                 try:
                     if sampling_cycle % m['frequency'] == 0:
-                        #logging.debug("Attempt to run command: " + str(m['command'] ))
+                        #logger.debug("Attempt to run command: " + str(m['command'] ))
                         output = subprocess.check_output(str(m['command']), shell=True, text=True, stderr=subprocess.DEVNULL, timeout=5).strip()
-                        #logging.debug("Output: "+str(output))
-                        #logging.debug("Applying regex: " + str(m['regex'] ))
+                        #logger.debug("Output: "+str(output))
+                        #logger.debug("Applying regex: " + str(m['regex'] ))
                         re_result = re.search(m['regex'], output)
                         if re_result:
                             value = float(re_result.group(1))
-                            logging.info(f"Current modification is {m['modification']} for run-metric {m['id']}")
+                            #logger.debug(f"Current modification is {m['modification']} for run-metric {m['id']}")
                             match m['modification']:
                                 case None:
                                     pass
@@ -167,24 +166,24 @@ def main():
                                     try:
                                         value = value / 3600
                                     except Exception as e:
-                                        logging.exception(f"Error during conversion type {m['modification']} with original value {value}")
+                                        logger.exception(f"Error during conversion type {m['modification']} with original value {value}")
                                 case 2: #Divide by 1000
                                     try:
                                         value = value / 1000
                                     except Exception as e:
-                                        logging.exception(f"Error during conversion type {m['modification']} with original value {value}")
+                                        logger.exception(f"Error during conversion type {m['modification']} with original value {value}")
                                 case _:
-                                    logging.exception(f"Error during excecution of run-metric {m['id']}: {e}")
+                                    logger.exception(f"Error during excecution of run-metric {m['id']}: {e}")
                             insert_cur = db.conn.cursor()
                             insert_cur.execute("INSERT INTO samples(metric_id, ts, value) VALUES (%s, %s, %s)", (m['id'], now_ts(), value))
                             insert_cur.close()
-                            logging.info(f"Run-metric {m['id']} processed with value {value}")
+                            logger.info(f"Run-metric {m['id']} processed with value {value}")
                         else:
-                            logging.warning(f"No match voor regex '{m['regex']}' on output: {output}")
+                            logger.warning(f"No match voor regex '{m['regex']}' on output: {output}")
                 except Exception as e:
-                    logging.exception(f"Error during excecution of run-metric {m['id']}: {e}")
+                    logger.exception(f"Error during excecution of run-metric {m['id']}: {e}")
         except Exception as e:
-            logging.exception(f"Error during processing of run-metrics: {e}")
+            logger.exception(f"Error during processing of run-metrics: {e}")
 
 
         # Sleep unitl next cyclus
