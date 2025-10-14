@@ -159,6 +159,11 @@ def main():
                                         value = value / 1000
                                     except Exception as e:
                                         logger.exception(f"Error during conversion type {m['modification']} with original value {value}")
+                                case 3: #Divide by 1024
+                                    try:
+                                        value = value / 1024
+                                    except Exception as e:
+                                        logger.exception(f"Error during conversion type {m['modification']} with original value {value}")
                                 case _:
                                     logger.exception(f"Error during excecution of run-metric {m['id']}: {e}")
                             insert_cur = db.conn.cursor()
