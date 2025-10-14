@@ -57,19 +57,6 @@ class DB:
             autocommit=True,
         )
 
-    #def ensure_metric(self, key: str, name: str, unit: str, description: str) -> int:
-    #    self.connect()
-    #    cur = self.conn.cursor()
-    #    cur.execute("SELECT id FROM metrics WHERE `key`=%s", (key,))
-    #    row = cur.fetchone()
-    #    if row:
-    #        cur.close()
-    #        return row[0]
-    #    cur.execute("INSERT INTO metrics(`key`, name, unit, description) VALUES(%s,%s,%s,%s)", (key, name, unit, description))
-    #    metric_id = cur.lastrowid
-    #    cur.close()
-    #    return metric_id
-
     def insert_samples(self, rows: List[Tuple[int, dt.datetime, float]]):
         if not rows:
             return
