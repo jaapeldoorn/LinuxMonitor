@@ -39,15 +39,19 @@ foreach ($viewable_metrics as $metric) {
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/luxon@3"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 </head>
 
 <body>
-  <header>
+  <header class="flex flex-col sm:flex-row">
+    <img src="https://icons.iconarchive.com/icons/hopstarter/gloss-mac/48/Activity-Monitor-icon.png" width="48" height="48">
+    <div>
     <h1>Linux Monitoring</h1>
     <p>Realtime monitoring dashboard</p>
+    </div>
   </header>
   <main>
-    <section class="controls">
+    <section class="controls flex flex-col md:flex-row">
       <label>Time window:
         <select id="range">
           <option value="60" <?= $config['app']['default_minutes'] == 60 ? 'selected' : '' ?>>1 hour</option>
