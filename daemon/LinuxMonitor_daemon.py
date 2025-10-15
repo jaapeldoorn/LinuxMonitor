@@ -22,6 +22,7 @@ from mysql.connector import errorcode  # SQL error codes
 from typing import Dict, List, Tuple   # variable structures
 from systemd import journal            # logging to journal
 import subprocess                      # execution of commands
+from datetime import datetime
 
 # --------------------------- Logging ---------------------------------
 
@@ -142,46 +143,92 @@ def main():
                         #result = subprocess.run("dir", shell=True, capture_output=True, text=True
                         #output = subprocess.check_output(str(m['command']), shell=True, text=True, stderr=subprocess.DEVNULL, timeout=5).strip()
                         #logger.debug("Output: "+str(output))
-                        #logger.debug("Applying regex: " + str(m['regex'] ))
                         re_result = re.findall(m['regex'], output)
                         #re_result = re.search(m['regex'], output)
+                        #logger.info(f"re_result: {re_result}")
                         if re_result: #RegEx match found
                             #value = float(re_result.group(1))
                             #logger.debug(f"Current modification is {m['modification']} for run-metric {m['id']}")
                             match m['modification']:
                                 case None:
-                                    #value = float(re_result.group(1))
                                     value = float(re_result[0])
                                 case 0:
-                                    #value = float(re_result.group(1))
                                     value = float(re_result[0])
                                 case 1: #Convert from sec to hour
                                     try:
-                                        #value = float(re_result.group(1)) / 3600
                                         value = float(re_result[0]) / 3600
                                     except Exception as e:
                                         logger.exception(f"Error during conversion type {m['modification']} with original value {value}")
                                 case 2: #Divide by 1000
                                     try:
-                                        #value = float(re_result.group(1)) / 1000
                                         value = float(re_result[0]) / 1000
                                     except Exception as e:
                                         logger.exception(f"Error during conversion type {m['modification']} with original value {value}")
                                 case 3: #Divide by 1024
                                     try:
-                                        #value = float(re_result.group(1)) / 1024
                                         value = float(re_result[0]) / 1024
                                     except Exception as e:
                                         logger.exception(f"Error during conversion type {m['modification']} with original value {value}")
                                 case 5: #Subtract 2 values and divide by 1024
                                     try:
-                                        #logger.info(f"re_result: {re_result}")
-                                        #logger.info(f"Eerste waarde: {re_result[0]}")
-                                        #logger.info(f"Tweede waarde: {re_result[1]}")
                                         value = ( float(re_result[0]) - float(re_result[1]) ) / 1024
-                                        logger.info(f"Resultaat: {value}")
                                     except Exception as e:
                                         logger.exception(f"Error during conversion type {m['modification']} with original value {value}")
+                                case 6: #Calculate BPS network trafic
+                                    try:
+                                        get_last_value = db.conn.cursor()
+                                        get_last_value.execute(f"SELECT `string`, ts from `txt-status` where metric_id = {m['id']};")
+                                        last_values = get_last_value.fetchall()
+                                        get_last_value.close
+                                        cur_ts = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
+                                        cur_value = float(re_result[0])
+                                        if len(last_values) == 0:
+                                            #first datapoint
+                                            value = 0
+                                        else:
+                                            #BPS calculation
+                                            last_value = float(last_values[0][0])
+                                            last_ts = last_values[0][1]
+                                            delta_value = (cur_value - last_value )
+                                            #logger.info(f"Delta Value: {delta_value}")
+                                            #delta_time = (datetime.strptime(cur_ts, "%Y-%m-%d %H:%M:%S.%f") - last_ts).total_seconds()
+                                            delta_time = (datetime.now() - last_ts).total_seconds()
+                                            #logger.info(f"Delta time: {delta_time}")
+                                            value = delta_value / delta_time
+                                            logger.info(f"bps: {value} for run-id {m['id']} and modificator {m['modification']}")
+                                        #logger.info("DB voor set value connected")
+                                        #updatestring =(f"INSERT INTO `txt-status`(metric_id, ts, string) VALUES ({m['id']}, '{cur_ts}', {cur_value}) ON DUPLICATE KEY UPDATE metric_id = {m['id']}, ts = {cur_ts}, string = {cur_value}")
+                                        #logger.info(f"updatestring: {updatestring}")
+                                        #logger.info(f"INSERT INTO `txt-status`(metric_id, ts, string) VALUES ({m['id']}, '{cur_ts}', {cur_value}) ON DUPLICATE KEY UPDATE metric_id = {m['id']}, ts = {cur_ts}, string = {cur_value}")
+                                        set_last_value = db.conn.cursor()
+                                        set_last_value.execute(f"INSERT INTO `txt-status`(metric_id, ts, string) VALUES ({m['id']}, '{cur_ts}', {cur_value}) ON DUPLICATE KEY UPDATE metric_id = {m['id']}, ts = '{cur_ts}', string = {cur_value}")
+                                        set_last_value.close
+                                    except Exception as e:
+                                        logger.exception(f"Error during conversion type {m['modification']} with original value {value}: {e}")
+                                case 7: #Calculate BPS network trafic and multiply by -1
+                                    try:
+                                        get_last_value = db.conn.cursor()
+                                        get_last_value.execute(f"SELECT `string`, ts from `txt-status` where metric_id = {m['id']};")
+                                        last_values = get_last_value.fetchall()
+                                        get_last_value.close
+                                        cur_ts = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
+                                        cur_value = float(re_result[0])
+                                        if len(last_values) == 0:
+                                            #first datapoint
+                                            value = 0
+                                        else:
+                                            #BPS calculation
+                                            last_value = float(last_values[0][0])
+                                            last_ts = last_values[0][1]
+                                            delta_value = (cur_value - last_value )
+                                            delta_time = (datetime.now() - last_ts).total_seconds()
+                                            value = (delta_value / delta_time) * -1
+                                            logger.info(f"bps: {value} for run-id {m['id']} and modificator {m['modification']}")
+                                        set_last_value = db.conn.cursor()
+                                        set_last_value.execute(f"INSERT INTO `txt-status`(metric_id, ts, string) VALUES ({m['id']}, '{cur_ts}', {cur_value}) ON DUPLICATE KEY UPDATE metric_id = {m['id']}, ts = '{cur_ts}', string = {cur_value}")
+                                        set_last_value.close
+                                    except Exception as e:
+                                        logger.exception(f"Error during conversion type {m['modification']} with original value {value}: {e}")
                                 case 88: #Match Found/NotFound
                                     try:
                                         value = 'Active'
@@ -198,6 +245,7 @@ def main():
                             if m['modification']==99 or m['modification']==88: #Strings
                                 insert_cur = db.conn.cursor()
                                 insert_cur.execute("INSERT INTO `txt-status`(metric_id, ts, string) VALUES (%s, %s, %s) ON DUPLICATE KEY UPDATE metric_id = %s, ts = %s, string = %s", (m['id'], now_ts(), value, m['id'], now_ts(), value))
+                                #logger.info("INSERT INTO `txt-status`(metric_id, ts, string) VALUES (%s, %s, %s) ON DUPLICATE KEY UPDATE metric_id = %s, ts = %s, string = %s", (m['id'], now_ts(), value, m['id'], now_ts(), value))
                                 insert_cur.close()
                                 logger.debug(f"Run-metric {m['id']} processed with text {value}")
                             else: #Numerics
