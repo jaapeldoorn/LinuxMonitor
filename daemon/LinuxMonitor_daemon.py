@@ -143,49 +143,75 @@ def main():
                         #output = subprocess.check_output(str(m['command']), shell=True, text=True, stderr=subprocess.DEVNULL, timeout=5).strip()
                         #logger.debug("Output: "+str(output))
                         #logger.debug("Applying regex: " + str(m['regex'] ))
-                        re_result = re.search(m['regex'], output)
-                        if re_result:
+                        re_result = re.findall(m['regex'], output)
+                        #re_result = re.search(m['regex'], output)
+                        if re_result: #RegEx match found
                             #value = float(re_result.group(1))
                             #logger.debug(f"Current modification is {m['modification']} for run-metric {m['id']}")
                             match m['modification']:
                                 case None:
-                                    value = float(re_result.group(1))
+                                    #value = float(re_result.group(1))
+                                    value = float(re_result[0])
                                 case 0:
-                                    value = float(re_result.group(1))
+                                    #value = float(re_result.group(1))
+                                    value = float(re_result[0])
                                 case 1: #Convert from sec to hour
                                     try:
-                                        value = float(re_result.group(1)) / 3600
+                                        #value = float(re_result.group(1)) / 3600
+                                        value = float(re_result[0]) / 3600
                                     except Exception as e:
                                         logger.exception(f"Error during conversion type {m['modification']} with original value {value}")
                                 case 2: #Divide by 1000
                                     try:
-                                        value = float(re_result.group(1)) / 1000
+                                        #value = float(re_result.group(1)) / 1000
+                                        value = float(re_result[0]) / 1000
                                     except Exception as e:
                                         logger.exception(f"Error during conversion type {m['modification']} with original value {value}")
                                 case 3: #Divide by 1024
                                     try:
-                                        value = float(re_result.group(1)) / 1024
+                                        #value = float(re_result.group(1)) / 1024
+                                        value = float(re_result[0]) / 1024
+                                    except Exception as e:
+                                        logger.exception(f"Error during conversion type {m['modification']} with original value {value}")
+                                case 5: #Subtract 2 values and divide by 1024
+                                    try:
+                                        #logger.info(f"re_result: {re_result}")
+                                        #logger.info(f"Eerste waarde: {re_result[0]}")
+                                        #logger.info(f"Tweede waarde: {re_result[1]}")
+                                        value = ( float(re_result[0]) - float(re_result[1]) ) / 1024
+                                        logger.info(f"Resultaat: {value}")
+                                    except Exception as e:
+                                        logger.exception(f"Error during conversion type {m['modification']} with original value {value}")
+                                case 88: #Match Found/NotFound
+                                    try:
+                                        value = 'Active'
                                     except Exception as e:
                                         logger.exception(f"Error during conversion type {m['modification']} with original value {value}")
                                 case 99: #Proces a string
                                     try:
-                                        value = re_result.group(1)
+                                        #value = re_result.group(1)
+                                        value = re_result[0]
                                     except Exception as e:
                                         logger.exception(f"Error during conversion type {m['modification']} with original value {value}")
                                 case _:
                                     logger.exception(f"Modification id {m['modification']} not defined (run ID = {m['id']})")
-                            if m['modification']==99:
+                            if m['modification']==99 or m['modification']==88: #Strings
                                 insert_cur = db.conn.cursor()
                                 insert_cur.execute("INSERT INTO `txt-status`(metric_id, ts, string) VALUES (%s, %s, %s) ON DUPLICATE KEY UPDATE metric_id = %s, ts = %s, string = %s", (m['id'], now_ts(), value, m['id'], now_ts(), value))
                                 insert_cur.close()
                                 logger.debug(f"Run-metric {m['id']} processed with text {value}")
-                            else:
+                            else: #Numerics
                                 insert_cur = db.conn.cursor()
                                 insert_cur.execute("INSERT INTO samples(metric_id, ts, value) VALUES (%s, %s, %s)", (m['id'], now_ts(), value))
                                 insert_cur.close()
                                 #logger.debug(f"Run-metric {m['id']} processed with value {value}")
                         else:
-                            logger.warning(f"No match voor regex '{m['regex']}' on output: {output}")
+                            if m['modification']==88:
+                                insert_cur = db.conn.cursor()
+                                insert_cur.execute("INSERT INTO `txt-status`(metric_id, ts, string) VALUES (%s, %s, %s) ON DUPLICATE KEY UPDATE metric_id = %s, ts = %s, string = %s", (m['id'], now_ts(), value, m['id'], now_ts(), value))
+                                insert_cur.close()
+                            else:
+                                logger.warning(f"No match voor regex '{m['regex']}' on output: {output}")
                 except Exception as e:
                     logger.exception(f"Error during excecution of run-metric {m['id']}: {e}")
         except Exception as e:
