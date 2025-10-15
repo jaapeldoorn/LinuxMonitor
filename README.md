@@ -101,9 +101,9 @@ Example Apache2 config file (/etc/apach2/sites-enabled/default.conf:
 </VirtualHost>
 ```
 
-#System Requirements
+# System Requirements
 - Linux host
-- Python 3.9+
+- Python 3.10+ (using match function)
 - MySQL 8+ or MariaDB 10.5+
 - PHP 8.1+ with pdo_mysql
 - Webserver (Apache or Nginx)
