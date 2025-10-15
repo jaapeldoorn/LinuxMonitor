@@ -78,7 +78,7 @@ class DB:
 
 # --------------------------- Main loop --------------------------------
 
-PLUGINS = []
+#PLUGINS = []
 
 
 def main():
@@ -129,7 +129,7 @@ def main():
         try:
             db.connect()
             cur = db.conn.cursor(dictionary=True)
-            cur.execute("SELECT id, run, command, regex, frequency, modification FROM metrics WHERE run=1")
+            cur.execute(F"SELECT id, command, regex, frequency, modification FROM metrics WHERE run=1 AND keystr LIKE '{cfg['host_label']}%'")
             run_metrics = cur.fetchall()
             cur.close()
             #logger.debug(str(run_metrics))
