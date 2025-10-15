@@ -137,7 +137,10 @@ def main():
                 try:
                     if sampling_cycle % m['frequency'] == 0:
                         #logger.debug("Attempt to run command: " + str(m['command'] ))
-                        output = subprocess.check_output(str(m['command']), shell=True, text=True, stderr=subprocess.DEVNULL, timeout=5).strip()
+                        sub_proc_obj = subprocess.run(str(m['command']), shell=True, capture_output=True, text=True, timeout=5)
+                        output = sub_proc_obj.stdout
+                        #result = subprocess.run("dir", shell=True, capture_output=True, text=True
+                        #output = subprocess.check_output(str(m['command']), shell=True, text=True, stderr=subprocess.DEVNULL, timeout=5).strip()
                         #logger.debug("Output: "+str(output))
                         #logger.debug("Applying regex: " + str(m['regex'] ))
                         re_result = re.search(m['regex'], output)
