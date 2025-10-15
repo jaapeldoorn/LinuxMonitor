@@ -170,7 +170,7 @@ def main():
                                     except Exception as e:
                                         logger.exception(f"Error during conversion type {m['modification']} with original value {value}")
                                 case _:
-                                    logger.exception(f"Error during excecution of run-metric {m['id']}: {e}")
+                                    logger.exception(f"Modification id {m['modification']} not defined (run ID = {m['id']})")
                             if m['modification']==99:
                                 insert_cur = db.conn.cursor()
                                 insert_cur.execute("INSERT INTO `txt-status`(metric_id, ts, string) VALUES (%s, %s, %s) ON DUPLICATE KEY UPDATE metric_id = %s, ts = %s, string = %s", (m['id'], now_ts(), value, m['id'], now_ts(), value))
