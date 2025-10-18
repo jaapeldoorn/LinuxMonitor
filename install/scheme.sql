@@ -22,3 +22,12 @@ CREATE TABLE IF NOT EXISTS samples (
   INDEX idx_metric_ts (metric_id, ts),
   CONSTRAINT fk_samples_metric FOREIGN KEY (metric_id) REFERENCES metrics(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS `txt-status` (
+  `metric_id` INT NOT NULL,
+  `ts` DATE NOT NULL,
+  `string` VARCHAR(255) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE `idx_metric-id` (`metric_id`)
+  CONSTRAINT `fk_text_metric` FOREIGN KEY (`metric_id`) REFERENCES `metrics`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT
+) ENGINE = InnoDB DEFAULT CHARSET=utf8mb4;

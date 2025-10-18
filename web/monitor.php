@@ -54,8 +54,8 @@ foreach ($viewable_metrics as $metric) {
       </div>
     </div>
     <div class="absolute right-6 top-6 flex flex-row gap-2">
-      <a href="status.php"><img src="./img/gauge.svg" class="icon w-8 h-8 bg-stone-500 hover:bg-stone-300"/></a>
-      <img src="./img/chart-line.svg" class="icon w-8 h-8 bg-stone-700"/>
+      <a href="status.php"><img src="./img/gauge.svg" class="icon w-12 h-12 bg-stone-500 hover:bg-stone-300"/></a>
+      <img src="./img/chart-line.svg" class="icon w-12 h-12 bg-stone-700"/>
     </div>
   </header>
   <main>
