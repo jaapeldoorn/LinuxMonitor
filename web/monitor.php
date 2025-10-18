@@ -71,7 +71,7 @@ foreach ($viewable_metrics as $metric) {
       <label>Server:
         <select id="device">
           <?php foreach ($devicelist as $d) : ?>
-            <option value="<?= htmlspecialchars($d['prefix']) ?>" <?= ($d['prefix'] === $cfg['app']['default_device']) ? ' selected' : '' ?><?= htmlspecialchars($d['prefix']) ?></option>
+            <option value="<?= htmlspecialchars($d['prefix']) ?>" <?= ($d['prefix'] === $cfg['app']['default_device']) ? ' selected' : '' ?>><?= htmlspecialchars($d['prefix']) ?></option>
           <?php endforeach; ?>
         </select>
       </label>
