@@ -135,18 +135,14 @@ def main():
             for m in run_metrics:
                 try:
                     if sampling_cycle % m['frequency'] == 0:
-                        #logger.debug("Attempt to run command: " + str(m['command'] ))
+                        logger.debug("Attempt to run command: " + str(m['command'] ))
                         sub_proc_obj = subprocess.run(str(m['command']), shell=True, capture_output=True, text=True, timeout=5)
                         output = sub_proc_obj.stdout
-                        #result = subprocess.run("dir", shell=True, capture_output=True, text=True
-                        #output = subprocess.check_output(str(m['command']), shell=True, text=True, stderr=subprocess.DEVNULL, timeout=5).strip()
-                        #logger.debug("Output: "+str(output))
+                        logger.debug("Output of run command: "+str(output))
                         re_result = re.findall(m['regex'], output)
-                        #re_result = re.search(m['regex'], output)
-                        #logger.info(f"re_result: {re_result}")
+                        logger.debug(f"Output from regex: {re_result}")
                         if re_result: #RegEx match found
-                            #value = float(re_result.group(1))
-                            #logger.debug(f"Current modification is {m['modification']} for run-metric {m['id']}")
+                            logger.debug(f"Will start modification {m['modification']} for run-metric {m['id']}")
                             match m['modification']:
                                 case None:
                                     value = float(re_result[0])
@@ -165,6 +161,11 @@ def main():
                                 case 3: #Divide by 1024
                                     try:
                                         value = float(re_result[0]) / 1024
+                                    except Exception as e:
+                                        logger.exception(f"Error during conversion type {m['modification']} with original value {value}")
+                                case 4: #Convert from sec to day
+                                    try:
+                                        value = float(re_result[0]) / 86400
                                     except Exception as e:
                                         logger.exception(f"Error during conversion type {m['modification']} with original value {value}")
                                 case 5: #Subtract 2 values and divide by 1024

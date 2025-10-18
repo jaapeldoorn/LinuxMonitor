@@ -93,6 +93,7 @@ Various options are available to process data retrieved from the regex step. If 
 1. Divide by 3600 (Conversion from seconds to hours)
 2. Divide by 1000
 3. Divide by 1024 (Conversion from kByte to MByte or byte to kByte)
+4. Divide by 86400 (Conversion fom seconds to days)
 5. Substract 2 values and divide by 1024 (to calculate used memory from available memory and free memory)
 6. Calculate network trafic in bps
 7. Calculate network trafic in bps and make the number negative
