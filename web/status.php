@@ -10,17 +10,29 @@ date_default_timezone_set($cfg['app']['timezone'] ?? 'UTC');
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Linux Monitor - Server status</title>
-  <link rel="icon" href="favicon.ico">
+  <link rel="icon" href="./img/favicon.ico">
   <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 </head>
 
 <body>
   <header>
-    <h1>Linux Monitoring</h1>
-    <p>Realtime monitoring dashboard</p>
+    <div class="flex flex-col sm:flex-row gap-3">
+      <div>
+        <img src="./img/Logo64.png">
+      </div>
+      <div>
+        <h1>Linux Monitoring</h1>
+        <p>Realtime monitoring dashboard</p>
+      </div>
+    </div>
+    <div class="absolute right-6 top-6 flex flex-row gap-2">
+      <img src="./img/gauge.svg" class="icon w-8 h-8 bg-stone-700"/>
+      <a href="monitor.php"><img src="./img/chart-line.svg" class="icon w-8 h-8 bg-stone-500 hover:bg-stone-300"/></a>
+    </div>
   </header>
   <main>
-    <section class="controls">
+    <section class="controls flex flex-col md:flex-row">
       <label><input type="checkbox" id="autorefresh" data-interval=" <?= $cfg['app']['mon_refresh_seconds'] ?> " checked /> Auto-refresh (<?= $cfg['app']['mon_refresh_seconds'] ?>s)</label>
     </section>
   </main>
