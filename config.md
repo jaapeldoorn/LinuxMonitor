@@ -57,7 +57,7 @@ There are 4 tabels that are linked together:
 - metrics
 - samples
 - txt-status
-- views (pending implementation)
+- views
 All tables are linked to the metrics table. 
 
 ### Metrics table
@@ -139,7 +139,13 @@ A date time field with the moment that this measurement was performed. This time
 The outcome of the modified regex of the run command. For this table the values are typically strings.
 
 ### views table
-This table is pending implementation. This table will be used to generate headers above each graph on the monitor page.
+This table contains the names for each view. The table consists of two fields. Both of the fields need to be filled in manually.
+
+**view_id**
+The number of the view as entered in the metrics table. For each unique number in the view field of the metrics table a record with this number is needed in this table.
+
+**view_name**
+The name of the view. This name will be visualized as the title of the graph on the monitoring page of the PHP webdashboard.
 
 ## PHP webdashboard configuration
 This file contains 4 sections:
