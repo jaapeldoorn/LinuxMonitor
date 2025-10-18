@@ -18,7 +18,7 @@ Create users and grant rights to the users (change password to own passwords and
 ```SQL
 CREATE DATABASE linuxmonitor CHARACTER SET utf8mb4;
 CREATE USER 'linmon_writer'@'localhost' IDENTIFIED BY 'WRITE31f34ert4ggs';
-GRANT SELECT, INSERT, DELETE ON linuxmonitor.* TO 'linmon_writer'@'localhost';
+GRANT SELECT, INSERT, UPDATE, DELETE ON linuxmonitor.* TO 'linmon_writer'@'localhost';
 CREATE USER 'linmon_reader'@'localhost' IDENTIFIED BY 'READerdg453rg43sg';
 GRANT SELECT ON linuxmonitor.* TO 'linmon_reader'@'localhost';
 FLUSH PRIVILEGES;
@@ -110,4 +110,5 @@ Example Apache2 config file (/etc/apach2/sites-enabled/default.conf:
 
 # Licence
 LinuxMonitor is available with the **MIT-licence**.
-The icon used is from Hopstarter (https://www.iconarchive.com/artist/hopstarter.html)
+The logo used is from Hopstarter (https://www.iconarchive.com/artist/hopstarter.html)
+The icons used are from FontAwesome (https://fontawesome.com/) and modified slightly.

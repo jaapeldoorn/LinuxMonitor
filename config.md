@@ -87,6 +87,7 @@ This fields contains the regex that is used to retrieve the relevant information
 
 **modification**
 Various options are available to process data retrieved from the regex step. If no modification need to take place this field should be kept NULL (preferably) or 0. Other options are:
+```
 1. Divide by 3600 (Conversion from seconds to hours)
 2. Divide by 1000
 3. Divide by 1024 (Conversion from kByte to MByte or byte to kByte)
@@ -95,9 +96,10 @@ Various options are available to process data retrieved from the regex step. If 
 7. Calculate network trafic in bps and make the number negative
 88. Return 'active' in case the regex is found and 'inactive' is the regex is not found. (E.g. used to use with netstat -nlt to monitor wheter a service is listening on a port). The result is saved as a string in the txt-status table. Only the last value is available.
 99. Save the regex as a string in the txt-value table. Only the last status will be saved.
-
+````
 **run**
 Indicates whether the command should be executed by the daemon or not.
+
 0. Do NOT run the command
 1. Do run the command
 
@@ -160,18 +162,35 @@ This parameter will hold the host\_label that will be loaded by default. This pa
 This parameter will hold the default time window for the graphs onS the monitor page.
 
 ### Database related settings
-    'host' => 'localhost',
-    'port' => 3306,
-    'dbname' => 'linuxmonitor',
-    'user' => 'linmon_reader',
-    'pass' => 'ReadX1sfRnqUGD2geO',
-    'charset' => 'utf8mb4',
+**host**
+The hostname of the MySQL server. Default value is 'localhost'.
+
+**port**
+The port on which the MySQL server is listening. The default value is 3306.
+
+**dbname**
+The database where the Linuxmonitor tabels are stored. The default value is 'linuxmonitor'.
+
+**user**
+The username of the user with reading rights to the LinuxMonitor tables. The default value is 'linmon_reader'. Configuration of the username is taken place in MySQL.
+
+**pass**
+The password of the user that will read the LinuxMonitor tables. This must be a self defined strong password identical to the password configured in MySQL.
+
+**charset**
+The charset used in the MySQL database. The default value is 'utf8mb4'.
+
 ### Global display defaults
-    'decimals' => 1,
+**decimals**
+The number of decimals used in the display on the PHP webdashboard. The default value is 1.
+
+**threshold**
+Thresholds used for different colors. The default values are
+```
     'thresholds' => [  // colors for default thresholds
       ['upto' => 70, 'color' => '#2ecc71'], // green
       ['upto' => 90, 'color' => '#f1c40f'], // yellow
       ['color' => '#e74c3c'],               // red
-
+```
 ### Sections in the status display.
 This section has to be worked out in more details in future releases.
