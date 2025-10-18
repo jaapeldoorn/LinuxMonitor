@@ -12,12 +12,13 @@ async function fetchMetric(metricKey, minutes){
     const jsDate = new Date(str.replace(' ', 'T').replace(/(\.\d{3})\d+/, '$1'));
     p.t = jsDate;
   }
+  //Data contains also unit
   return data;
 }
 
-function lineDataset(label, color, data){
+function lineDataset(label, color, data, unit){
   return {
-    label, data,
+    label, data, unit,
     parsing: {xAxisKey: 't', yAxisKey: 'v'},
     borderColor: color,
     backgroundColor: color + '40',
@@ -27,6 +28,7 @@ function lineDataset(label, color, data){
 }
 
 function ensureChart(canvasId, label, datasets){
+  console.log("Datasets: ", datasets)
   const ctx = document.getElementById(canvasId).getContext('2d');
   if(charts[canvasId]){
     const c = charts[canvasId];
@@ -52,8 +54,19 @@ function ensureChart(canvasId, label, datasets){
             size: 18,
             weight: 'bold'},
           color: '#e8eef7' },
-        tooltip: { mode: 'index', intersect: false }
-      },
+        tooltip: {
+          mode: 'index',
+          intersect: false,
+          callbacks: {
+            label: function(context) {
+              const unit = context.dataset.unit || '';
+              const value = context.parsed.y;
+              const rounded = typeof value === 'number' ? value.toFixed(1) : value;
+              return `${context.dataset.label}: ${rounded} ${unit}`;
+              }
+            }
+          }
+        },
       scales: {
         x: {
           type: 'time',
@@ -99,7 +112,7 @@ async function loadAll(){
         if (data.points && data.points.length > 0) {
           hasData = true;
         }
-        datasets.push(lineDataset(s.label || data.name, s.color, data.points));
+        datasets.push(lineDataset(s.label || data.name, s.color, data.points, data.unit));
       }
      const card = document.getElementById(m.canvasId)?.closest('.card');
       if (hasData && datasets.length > 0) {
