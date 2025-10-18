@@ -5,7 +5,7 @@ const charts = {};
 async function fetchMetric(metricKey, minutes){
   const url = `apimon.php?action=data&metric=${encodeURIComponent(metricKey)}&minutes=${minutes}`;
   const res = await fetch(url);
-  if(!res.ok){ throw new Error('API fout'); }
+  if(!res.ok){ throw new Error('API error'); }
   const data = await res.json();
   for(const p of data.points){
     const str = p.t;
@@ -32,6 +32,7 @@ function ensureChart(canvasId, label, datasets){
     const c = charts[canvasId];
     c.data.datasets = datasets;
     c.options.plugins.title.text = label;
+    c.options.plugins.title.display = true;
     c.update();
     return c;
   }
@@ -40,13 +41,35 @@ function ensureChart(canvasId, label, datasets){
     data: { datasets },
     options: {
       responsive: true,
-      interaction: { mode: 'nearest', intersect: false },
+      interaction: { mode: 'index', intersect: false },
       plugins: {
         legend: { labels: { color: '#e8eef7' } },
-        title: { display: false, text: label, color: '#e8eef7' }
+        title: {
+          display: true,
+          text: label,
+          align: 'start',
+          font: {
+            size: 18,
+            weight: 'bold'},
+          color: '#e8eef7' },
+        tooltip: { mode: 'index', intersect: false }
       },
       scales: {
-        x: { type: 'time', time: { tooltipFormat: 'yyyy-MM-dd HH:mm:ss' }, ticks: { color: '#98a2b3' }, grid:{color:'#1f2630'} },
+        x: {
+          type: 'time',
+          time: {
+            tooltipFormat: 'yyyy-MM-dd HH:mm:ss',
+           displayFormats: {
+             hour: 'dd-MMM HH:mm',
+             minute: 'dd-MMM HH:mm',
+             day: 'dd-MMM HH:mm' } },
+          ticks: {
+            color: '#98a2b3',
+            callback: function(value, index, ticks) { const dt = luxon.DateTime.fromMillis(value); return dt.toFormat('dd-MMM HH:mm').toUpperCase();},
+            maxRotation: 45,
+            minRotation: 45
+            },
+          grid:{color:'#1f2630'} },
         y: { ticks: { color: '#98a2b3' }, grid:{color:'#1f2630'} }
       }
     }
