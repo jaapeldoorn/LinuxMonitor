@@ -9,7 +9,7 @@ function db_connect($cfg)
     try {
         return get_pdo($cfg);
     } catch (Throwable $e) {
-        error_response(500, 'DB connectie mislukt');
+        error_response(500, 'DB connection failed');
     }
 }
 
@@ -26,7 +26,7 @@ function fetch_metric_meta($pdo, $key)
     $stmt->execute([$key]);
     $meta = $stmt->fetch();
     if (!$meta) {
-        error_response(404, 'metric niet gevonden');
+        error_response(404, 'metric not found');
     }
     return $meta;
 }
@@ -80,7 +80,7 @@ if ($action === 'viewable') {
 $key = $_GET['metric'] ?? null;
 $minutes = intval($_GET['minutes'] ?? $cfg['default_minutes']);
 if (!$key) {
-    error_response(400, 'parameter "metric" ontbreekt');
+    error_response(400, 'parameter "metric" is missing');
 }
 
 $meta = fetch_metric_meta($pdo, $key);
