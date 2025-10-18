@@ -79,9 +79,6 @@ class DB:
 
 # --------------------------- Main loop --------------------------------
 
-#PLUGINS = []
-
-
 def main():
     # Get config
     parser = argparse.ArgumentParser()
@@ -129,11 +126,12 @@ def main():
         # Proces metrics with run=1 in database
         try:
             db.connect()
-            cur = db.conn.cursor(dictionary=True)
-            cur.execute(F"SELECT id, command, regex, frequency, modification FROM metrics WHERE run=1 AND keystr LIKE '{cfg['host_label']}%'")
-            run_metrics = cur.fetchall()
-            cur.close()
-            #logger.debug(str(run_metrics))
+            if samping_cyle == 1 or sampling_cycle % 10 == 0:
+                cur = db.conn.cursor(dictionary=True)
+                cur.execute(F"SELECT id, command, regex, frequency, modification FROM metrics WHERE run=1 AND keystr LIKE '{cfg['host_label']}%'")
+                run_metrics = cur.fetchall()
+                cur.close()
+                logger.debug(f"Current run strategy from MySQL server: {str(run_metrics)}")
             for m in run_metrics:
                 try:
                     if sampling_cycle % m['frequency'] == 0:

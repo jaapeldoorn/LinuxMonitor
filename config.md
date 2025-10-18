@@ -62,6 +62,8 @@ All tables are linked to the metrics table.
 
 ### Metrics table
 The metrics table is the central repository how to run, process and report all performance metrics of one or more linux servers.
+Changes in the metrics table are effective within 10 runs of the deamon or after a reload of the daemon. (The deamon checks the database every 10 cycly).
+
 The table consist of the following fields:
 **id**
 An autofilled field with increasing numbers to identifie all the records in this table. This number is the run-ID mentioned in the logging of the daemon.
