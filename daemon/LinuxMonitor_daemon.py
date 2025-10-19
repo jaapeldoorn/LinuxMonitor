@@ -126,7 +126,7 @@ def main():
         # Proces metrics with run=1 in database
         try:
             db.connect()
-            if samping_cyle == 1 or sampling_cycle % 10 == 0:
+            if sampling_cycle == 1 or sampling_cycle % 10 == 0:
                 cur = db.conn.cursor(dictionary=True)
                 cur.execute(F"SELECT id, command, regex, frequency, modification FROM metrics WHERE run=1 AND keystr LIKE '{cfg['host_label']}%'")
                 run_metrics = cur.fetchall()
@@ -136,7 +136,7 @@ def main():
                 try:
                     if sampling_cycle % m['frequency'] == 0:
                         logger.debug("Attempt to run command: " + str(m['command'] ))
-                        sub_proc_obj = subprocess.run(str(m['command']), shell=True, capture_output=True, text=True, timeout=5)
+                        sub_proc_obj = subprocess.run(str(m['command']), shell=True, capture_output=True, text=True, timeout=25)
                         output = sub_proc_obj.stdout
                         logger.debug("Output of run command: "+str(output))
                         re_result = re.findall(m['regex'], output)
@@ -189,16 +189,8 @@ def main():
                                             last_value = float(last_values[0][0])
                                             last_ts = last_values[0][1]
                                             delta_value = (cur_value - last_value )
-                                            #logger.info(f"Delta Value: {delta_value}")
-                                            #delta_time = (datetime.strptime(cur_ts, "%Y-%m-%d %H:%M:%S.%f") - last_ts).total_seconds()
                                             delta_time = (datetime.now() - last_ts).total_seconds()
-                                            #logger.info(f"Delta time: {delta_time}")
                                             value = delta_value / delta_time
-                                            logger.info(f"bps: {value} for run-id {m['id']} and modificator {m['modification']}")
-                                        #logger.info("DB voor set value connected")
-                                        #updatestring =(f"INSERT INTO `txt-status`(metric_id, ts, string) VALUES ({m['id']}, '{cur_ts}', {cur_value}) ON DUPLICATE KEY UPDATE metric_id = {m['id']}, ts = {cur_ts}, string = {cur_value}")
-                                        #logger.info(f"updatestring: {updatestring}")
-                                        #logger.info(f"INSERT INTO `txt-status`(metric_id, ts, string) VALUES ({m['id']}, '{cur_ts}', {cur_value}) ON DUPLICATE KEY UPDATE metric_id = {m['id']}, ts = {cur_ts}, string = {cur_value}")
                                         set_last_value = db.conn.cursor()
                                         set_last_value.execute(f"INSERT INTO `txt-status`(metric_id, ts, string) VALUES ({m['id']}, '{cur_ts}', {cur_value}) ON DUPLICATE KEY UPDATE metric_id = {m['id']}, ts = '{cur_ts}', string = {cur_value}")
                                         set_last_value.close
@@ -222,7 +214,6 @@ def main():
                                             delta_value = (cur_value - last_value )
                                             delta_time = (datetime.now() - last_ts).total_seconds()
                                             value = (delta_value / delta_time) * -1
-                                            logger.info(f"bps: {value} for run-id {m['id']} and modificator {m['modification']}")
                                         set_last_value = db.conn.cursor()
                                         set_last_value.execute(f"INSERT INTO `txt-status`(metric_id, ts, string) VALUES ({m['id']}, '{cur_ts}', {cur_value}) ON DUPLICATE KEY UPDATE metric_id = {m['id']}, ts = '{cur_ts}', string = {cur_value}")
                                         set_last_value.close
@@ -235,7 +226,6 @@ def main():
                                         logger.exception(f"Error during conversion type {m['modification']} with original value {value}")
                                 case 99: #Proces a string
                                     try:
-                                        #value = re_result.group(1)
                                         value = re_result[0]
                                     except Exception as e:
                                         logger.exception(f"Error during conversion type {m['modification']} with original value {value}")
@@ -244,14 +234,12 @@ def main():
                             if m['modification']==99 or m['modification']==88: #Strings
                                 insert_cur = db.conn.cursor()
                                 insert_cur.execute("INSERT INTO `txt-status`(metric_id, ts, string) VALUES (%s, %s, %s) ON DUPLICATE KEY UPDATE metric_id = %s, ts = %s, string = %s", (m['id'], now_ts(), value, m['id'], now_ts(), value))
-                                #logger.info("INSERT INTO `txt-status`(metric_id, ts, string) VALUES (%s, %s, %s) ON DUPLICATE KEY UPDATE metric_id = %s, ts = %s, string = %s", (m['id'], now_ts(), value, m['id'], now_ts(), value))
                                 insert_cur.close()
                                 logger.debug(f"Run-metric {m['id']} processed with text {value}")
                             else: #Numerics
                                 insert_cur = db.conn.cursor()
                                 insert_cur.execute("INSERT INTO samples(metric_id, ts, value) VALUES (%s, %s, %s)", (m['id'], now_ts(), value))
                                 insert_cur.close()
-                                #logger.debug(f"Run-metric {m['id']} processed with value {value}")
                         else:
                             if m['modification']==88:
                                 insert_cur = db.conn.cursor()
@@ -267,6 +255,7 @@ def main():
 
         # Sleep unitl next cyclus
         elapsed = time.time() - start
+        logger.info(f"Duration of {sampling_cycle} was {round(elapsed)} sec")
         sleep_for = max(0.0, interval - elapsed)
         time.sleep(sleep_for)
 
