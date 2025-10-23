@@ -58,13 +58,13 @@ button:hover{border-color:var(--accent)}
 }
 
 .lm-section-title {
-  background-color: #123876;
+  /*background-color: #123876;*/
   float: left;
   font-family: Tahoma, Helvetica;
   font-size: 21px;
   width: 150px;
   margin: 5px;
-  gap: 5px;
+  gap: 10px;
   align-items: center;
   display: flex;
 }
@@ -77,16 +77,32 @@ button:hover{border-color:var(--accent)}
 
 .lm-section-text {
   float: left;
-  background-color: #457823;
+  /*background-color: #457823;*/
+  padding: 10px;
+  }
+
+.lm-gauges {
+  display: flex;
   }
 
 .lm-gauge {
   width: 100px;
-  heigth: 100px;
+  height: 100px;
   }
 
+p {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  line-height: 1.8;
+  margin-bottom: 0px;
+  }
+
+.badge {
+ margin-right: 10px
+ }
+
 .progress {
-  margin: 10px;
+  width: 250px;
   }
 
 @media (min-width: 640px) {
