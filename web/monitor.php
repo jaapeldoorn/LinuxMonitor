@@ -11,12 +11,12 @@ function random_color()
   return sprintf('#%06X', mt_rand(0, 0xFFFFFF));
 }
 try {
-  // Ophalen van devicelist direct uit de database
+  // Retrieve devicelist from database
   $pdo = get_pdo($cfg);
   $stmt = $pdo->query("SELECT DISTINCT SUBSTRING_INDEX(`keystr`, '.', 1) AS prefix FROM metrics");
   $devicelist = $stmt->fetchAll();
 
-  // Ophalen van alle metrics waar view niet 0 of null is
+  // Retrieve all metrics where view not 0 or null
   $stmt2 = $pdo->query("SELECT metrics.*, views.view_name FROM metrics LEFT JOIN views ON metrics.view = views.view_id WHERE metrics.view IS NOT NULL AND metrics.view != 0 ORDER BY metrics.view asc");
   $viewable_metrics = $stmt2->fetchAll();
 } catch (Throwable $e) {
@@ -32,7 +32,7 @@ foreach ($viewable_metrics as $metric) {
 }
 ?>
 <!doctype html>
-<html lang="nl">
+<html lang="en">
 
 <head>
   <meta charset="utf-8" />

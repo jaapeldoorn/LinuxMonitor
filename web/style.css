@@ -44,6 +44,51 @@ button:hover{border-color:var(--accent)}
   border-bottom:1px solid #222;
   }
 
+.lm-columns {
+  columns: 300px 3;
+  column-gap: 15px;
+  }
+
+.lm-section {
+  display: inline-block;
+  border-radius:8px;
+  width: 100%;
+  background-color: #244534;
+  margin: 5px 0;
+}
+
+.lm-section-title {
+  background-color: #123876;
+  float: left;
+  font-family: Tahoma, Helvetica;
+  font-size: 21px;
+  width: 150px;
+  margin: 5px;
+  gap: 5px;
+  align-items: center;
+  display: flex;
+}
+
+.lm-section-title img {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+  }
+
+.lm-section-text {
+  float: left;
+  background-color: #457823;
+  }
+
+.lm-gauge {
+  width: 100px;
+  heigth: 100px;
+  }
+
+.progress {
+  margin: 10px;
+  }
+
 @media (min-width: 640px) {
   .lm-header {
     flex-direction: row;
