@@ -31,8 +31,6 @@ catch (Throwable $e) {
     echo '  <script src="https://kit.fontawesome.com/' . $fontAwesomeID . '.js" crossorigin="anonymous"></script>'
   }
 ?>
-
-  <script src="https://kit.fontawesome.com/c0aedb2046.js" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/justgage@latest/dist/justgage.umd.js"></script>
 </head>
 
@@ -83,9 +81,9 @@ catch (Throwable $e) {
             switch ($element['type']){
               case 'badge':
                 $pdo = get_pdo($cfg);
-                $stmt = $pdo->query("SELECT `txt-status`.string, metrics.description FROM `txt-status` JOIN metrics on `txt-status`.metric_id = metrics.id where `txt-status`.metric_id = " . $element['ID']);
+                $stmt = $pdo->query("SELECT `txt-status`.string, metrics.name FROM `txt-status` JOIN metrics on `txt-status`.metric_id = metrics.id where `txt-status`.metric_id = " . $element['ID']);
                 $row = $stmt->fetch(PDO::FETCH_ASSOC);
-                echo '<p><span class="badge bg-primary">' .  $row['string'] . '</span> '. $row['description'].'</p>';
+                echo '<p><span class="badge bg-primary">' .  $row['string'] . '</span> '. $row['name'].'</p>';
                 break;
               case 'UFT-string':
                 $pdo = get_pdo($cfg);
@@ -148,10 +146,10 @@ catch (Throwable $e) {
                 foreach ([$gaugeMetricID1,$gaugeMetricID2,$gaugeMetricID3] as $gaugeMetric) {
                   if ($gaugeMetric <> '') {
                     $pdo = get_pdo($cfg);
-                    $stmt = $pdo->query("SELECT samples.value, metrics.description, metrics.unit FROM `samples` JOIN metrics on samples.metric_id = metrics.id where samples.metric_id = " . $gaugeMetric . " order by samples.ts DESC limit 1;");
+                    $stmt = $pdo->query("SELECT samples.value, metrics.name, metrics.unit FROM `samples` JOIN metrics on samples.metric_id = metrics.id where samples.metric_id = " . $gaugeMetric . " order by samples.ts DESC limit 1;");
                     $row = $stmt->fetch(PDO::FETCH_ASSOC);
                     echo '<div class="lm-gauge" id="lm-gauge-' . $gaugeMetric . '"></div>';
-                    echo '<script> new JustGage({id: "lm-gauge-' . $gaugeMetric . '", value: ' . $row['value'] . ', min: ' . $element['min'] . ', max: ' . $element['max'] . ', decimals: ' . $element['decimals'] .', title: "' . $row['description'] . '", label: "' . $row['unit'] . '" }); </script>';
+                    echo '<script> new JustGage({id: "lm-gauge-' . $gaugeMetric . '", value: ' . $row['value'] . ', min: ' . $element['min'] . ', max: ' . $element['max'] . ', decimals: ' . $element['decimals'] .', title: "' . $row['name'] . '", label: "' . $row['unit'] . '" }); </script>';
                   }
                 }
                 echo '</div>';
