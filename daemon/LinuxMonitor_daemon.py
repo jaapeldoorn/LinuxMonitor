@@ -5,7 +5,6 @@ LinuxMonitor daemon
 
 - Collects system statistics as configured MySQL table Metrics
 - Stores configured statistics in MySQL table Metrics
-- Periodic retention cleanup
 """
 
 # --------------------------- Imports ---------------------------------
@@ -58,25 +57,6 @@ class DB:
             autocommit=True,
         )
 
-    def insert_samples(self, rows: List[Tuple[int, dt.datetime, float]]):
-        if not rows:
-            return
-        self.connect()
-        cur = self.conn.cursor()
-        cur.executemany("INSERT INTO samples(metric_id, ts, value) VALUES(%s,%s,%s)", rows)
-        cur.close()
-
-    def purge_old(self, retention_days: int):
-        if not retention_days or retention_days <= 0:
-            return
-        self.connect()
-        cur = self.conn.cursor()
-        cur.execute("DELETE FROM samples WHERE ts < (UTC_TIMESTAMP(6) - INTERVAL %s DAY)", (retention_days,))
-        deleted = cur.rowcount
-        cur.close()
-        if deleted:
-            logger.info("Retention: %d old samples removed", deleted)
-
 # --------------------------- Main loop --------------------------------
 
 def main():
@@ -105,23 +85,11 @@ def main():
 
     logger.debug("LinuxMonitor daemon started (interval=%ss, host_label=%s)", interval, cfg['host_label'])
 
-    last_purge = 0.0
-    PURGE_EVERY = 3600.0  # every hour TODO
-
     sampling_cycle = 1
 
     while True:
         logger.info("Samping cycle " + str(sampling_cycle) + " started")
         start = time.time()
-
-        # Retention period
-        if (time.time() - last_purge) > PURGE_EVERY:
-            try:
-                #db.purge_old(retention_days)
-                logger.debug("No retention performed.")
-            except Exception as e:
-                logger.exception("Fout bij retentie-opruiming: %s", e)
-            last_purge = time.time()
 
         # Proces metrics with run=1 in database
         try:

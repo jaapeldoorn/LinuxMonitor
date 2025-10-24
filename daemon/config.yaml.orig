@@ -1,6 +1,5 @@
 # LinuxMonitor daemon configuration
 interval_seconds: 60            # sample-interval
-retention_days: 31              # removal of old records (NULL = off)
 log_level: info                 # debug, info, warning, error, critical
 
 mysql:

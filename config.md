@@ -11,11 +11,6 @@ The interval between each run of the daemon in seconds.
 The standard setting is 60. 
 With this settings the daemon checks every 60 seconds whether a command should be executed or not (as configured in the database).
 
-**retention_days:**
-Currently not in use
-The standard setting is 31
-This setting has currently no function
-
 ### mysql
 
 **log_level:**
