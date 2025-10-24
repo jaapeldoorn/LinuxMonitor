@@ -16,6 +16,8 @@ Currently not in use
 The standard setting is 31
 This setting has currently no function
 
+### mysql
+
 **log_level:**
 This determine how much detail will be logged to the journal.
 The standard setting is info. Other settings are (from more detail to less detail) debug, info, warning, error, critical
@@ -45,6 +47,17 @@ This username can be changed in MySQL.
 The password of the MySQL user 
 There is not default value. The original value should be replaced by another strong password. This password MUST be idential to the password defined in the MySQL database.
 This password can be changed in MySQL
+
+### dbCleanup
+
+**toQuarter**
+The number of days after which the data will be aggegrated to one datapoint per quarter of an hour. This number should be smaller than toHour.
+
+**toHour**
+The number of days after which the data will be aggegrated to one datapoint per hour. This number should be smaller than toDay.
+
+**toDay**
+The number of days after which the data will be aggegrated to one datepoint per day.
 
 **host_label:**
 The name of this system in Linux monitor.

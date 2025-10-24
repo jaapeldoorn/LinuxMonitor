@@ -101,6 +101,13 @@ Example Apache2 config file (/etc/apach2/sites-enabled/default.conf:
 </VirtualHost>
 ```
 
+## Database cleanup
+If you want to reduce the database size it is recommended to create a periodic task to run dbCleanup. This script aggregates data after a period (see configuration) to one datapoint per quarter of an hour, one data point per hour and one datapoint per day.
+The script can be added to cron with the following command:
+```
+/etc/LinuxMonitor/daemon/.venv/bin/python /etc/LinuxMonitor/daemon/dbCleanup.py
+```
+
 # System Requirements
 - Linux host
 - Python 3.10+ (using match function)

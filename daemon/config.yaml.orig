@@ -10,5 +10,10 @@ mysql:
   user: linmon_writer
   password: WRITE31f34ert4ggs
 
+dbCleanup:
+  toQuarter: 10
+  toHour: 20
+  toDay: 40
+
 # Host label (to distingish between servers)
 host_label: "System1"
