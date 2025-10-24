@@ -63,9 +63,8 @@ catch (Throwable $e) {
   </section>
   <main>
     <div class="lm-columns">
- <?php foreach ($cfg['sections'] as $sIndex => $section):
-   if ($section['system'] === 'all' || $section['system'] === $cfg['app']['default_device']) {
-     echo '<div class="lm-section">';
+   <?php foreach ($cfg['sections'] as $sIndex => $section):
+     echo '<div class="lm-section" section="' . $section['system'] . '">';
      echo '<div class="lm-section-title">';
      $logo = htmlspecialchars($section['logo'] ?? 'NoLogo');
      if (strpos($logo, '.') !== false) {
@@ -152,8 +151,7 @@ catch (Throwable $e) {
                     $stmt = $pdo->query("SELECT samples.value, metrics.name, metrics.unit FROM `samples` JOIN metrics on samples.metric_id = metrics.id where samples.metric_id = " . $gaugeMetric . " order by samples.ts DESC limit 1;");
                     $row = $stmt->fetch(PDO::FETCH_ASSOC);
                     echo '<div class="lm-gauge" id="lm-gauge-' . $gaugeMetric . '"></div>';
-                    echo '<script> new JustGage({id: "lm-gauge-' . $gaugeMetric . '", value: ' . $row['value'] . ', min: ' . $element['min'] . ', max: ' . $element['max'] . ', decimals: ' .
- $element['decimals'] .', title: "' . $row['name'] . '", label: "' . $row['unit'] . '", '. $standardgaugestyles .' }); </script>';
+                    echo '<script> new JustGage({id: "lm-gauge-' . $gaugeMetric . '", value: ' . $row['value'] . ', min: ' . $element['min'] . ', max: ' . $element['max'] . ', decimals: ' . $element['decimals'] .', title: "' . $row['name'] . '", label: "' . $row['unit'] . '", '. $standardgaugestyles .' }); </script>';
                   }
                 }
                 echo '</div>';
@@ -166,14 +164,29 @@ catch (Throwable $e) {
           endforeach;
         echo '</div>';
       echo '</div>';
-    } endforeach; ?>
+    endforeach; ?>
 
     </div>
     <div class="muted">Last update: <span id="lastUpdate">—</span></div>
   </main>
 
   <script src="autorefresh.js"></script>
-
+  <script>
+    document.getElementById('device').addEventListener('change', function () {
+      const selected = this.value;
+      const divs = document.querySelectorAll('div[system]');
+      divs.forEach(div => {
+        const sys = div.getAttribute('system');
+        if (sys === 'all' || sys === selected) {
+            div.style.display = ''; // tonen
+        } else {
+            div.style.display = 'none'; // verbergen
+        }
+      });
+    });
+    // Initiale weergave bij laden
+   document.getElementById('device').dispatchEvent(new Event('change'));
+  </script>
   <script>
     const REFRESH_MS = <?= (int)($cfg['app']['refresh_seconds'] ?? 10) ?> * 1000;
 
