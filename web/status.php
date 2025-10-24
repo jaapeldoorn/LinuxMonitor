@@ -82,7 +82,11 @@ catch (Throwable $e) {
                 $pdo = get_pdo($cfg);
                 $stmt = $pdo->query("SELECT `txt-status`.string, metrics.name FROM `txt-status` JOIN metrics on `txt-status`.metric_id = metrics.id where `txt-status`.metric_id = " . $element['ID']);
                 $row = $stmt->fetch(PDO::FETCH_ASSOC);
-                echo '<p><span class="badge bg-primary">' .  $row['string'] . '</span> '. $row['name'].'</p>';
+                $badgecolor = $cfg['labels'][$row['string']] ?? '';
+                if ($badgecolor == ''){
+                  $badgecolor = 'bg-primary';
+                }
+                echo '<p><span class="badge ' . $badgecolor . '">' .  $row['string'] . '</span> '. $row['name'].'</p>';
                 break;
               case 'UFT-string':
                 $pdo = get_pdo($cfg);
