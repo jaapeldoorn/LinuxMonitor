@@ -35,7 +35,7 @@ catch (Throwable $e) {
         <img src="./img/Logo64.png">
       </div>
       <div>
-        <h1>Linux Monitoring</h1>
+        <p class="lm-appname">Linux Monitoring</p>
         <p>Realtime monitoring dashboard</p>
       </div>
     </div>
@@ -44,18 +44,18 @@ catch (Throwable $e) {
       <a href="monitor.php"><img src="./img/chart-line.svg" class="icon inactive"/></a>
     </div>
   </header>
+  <section class="lm-menu">
+    <label>Server IS NOT WORKING:
+      <select id="device">
+        <?php foreach ($devicelist as $d) : ?>
+          <option value="<?= htmlspecialchars($d['prefix']) ?>" <?= ($d['prefix'] === $cfg['app']['default_device']) ? ' selected' : '' ?>><?= htmlspecialchars($d['prefix']) ?></option>
+        <?php endforeach; ?>
+      </select>
+    </label>
+    <button id="refresh">Refresh</button>
+    <label><input type="checkbox" id="autorefresh" data-interval=" <?= $cfg['app']['mon_refresh_seconds'] ?> " checked /> Auto-refresh (<?= $cfg['app']['mon_refresh_seconds'] ?>s)</label>
+  </section>
   <main>
-    <section class="lm-menu">
-      <label>Server IS NOT WORKING:
-        <select id="device">
-          <?php foreach ($devicelist as $d) : ?>
-            <option value="<?= htmlspecialchars($d['prefix']) ?>" <?= ($d['prefix'] === $cfg['app']['default_device']) ? ' selected' : '' ?>><?= htmlspecialchars($d['prefix']) ?></option>
-          <?php endforeach; ?>
-        </select>
-      </label>
-      <button id="refresh">Refresh</button>
-      <label><input type="checkbox" id="autorefresh" data-interval=" <?= $cfg['app']['mon_refresh_seconds'] ?> " checked /> Auto-refresh (<?= $cfg['app']['mon_refresh_seconds'] ?>s)</label>
-    </section>
     <div class="lm-columns">
  <?php foreach ($cfg['sections'] as $sIndex => $section):
    if ($section['system'] === 'all' || $section['system'] === $cfg['app']['default_device']) {

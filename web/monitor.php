@@ -52,7 +52,7 @@ foreach ($viewable_metrics as $metric) {
         <img src="./img/Logo64.png">
       </div>
       <div>
-        <h1>Linux Monitoring</h1>
+        <p class="lm-appname">Linux Monitoring</p>
         <p>Realtime monitoring dashboard</p>
       </div>
     </div>
