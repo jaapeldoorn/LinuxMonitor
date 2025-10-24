@@ -191,6 +191,12 @@ This parameter will hold the default time window for the graphs on the monitor p
 ```
 The other options (with a longer duration) are not possible to prevent server performance issues.
 
+**FontAwesomeID**
+The ID needed to use icons from the FontAwesome collection. Registration is free. The ID can be found via the 'Set up icons in a project with 1 line of code' link on https://fontawesome.com/kits. The code is the underscore part of the following text:
+```
+<script src="https://kit.fontawesome.com/__________.js" crossorigin="anonymous"></script>
+```
+
 ### Database related settings
 **host**
 The hostname of the MySQL server. Default value is 'localhost'.

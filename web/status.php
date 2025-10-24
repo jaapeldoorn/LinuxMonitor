@@ -24,6 +24,14 @@ catch (Throwable $e) {
   <link rel="icon" href="./img/favicon.ico">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
+
+<?php
+  $fontAwesomeID = $config['app']['FontAwesomeID'] ?? '';
+  if $fontAwesomeID <> '' {
+    echo '  <script src="https://kit.fontawesome.com/' . $fontAwesomeID . '.js" crossorigin="anonymous"></script>'
+  }
+?>
+
   <script src="https://kit.fontawesome.com/c0aedb2046.js" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/justgage@latest/dist/justgage.umd.js"></script>
 </head>
