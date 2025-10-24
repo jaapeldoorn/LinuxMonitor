@@ -27,8 +27,8 @@ catch (Throwable $e) {
 
 <?php
   $fontAwesomeID = $config['app']['FontAwesomeID'] ?? '';
-  if $fontAwesomeID <> '' {
-    echo '  <script src="https://kit.fontawesome.com/' . $fontAwesomeID . '.js" crossorigin="anonymous"></script>'
+  if ($fontAwesomeID <> '') {
+    echo '  <script src="https://kit.fontawesome.com/' . $fontAwesomeID . '.js" crossorigin="anonymous"></script>';
   }
 ?>
   <script src="https://unpkg.com/justgage@latest/dist/justgage.umd.js"></script>
@@ -143,13 +143,15 @@ catch (Throwable $e) {
                 $gaugeMetricID2 = $element['ID2'] ?? '';
                 $gaugeMetricID3 = $element['ID3'] ?? '';
                 echo '<div class="lm-gauges">';
+                $standardgaugestyles = 'valueFontColor: "#FFFFFF"';
                 foreach ([$gaugeMetricID1,$gaugeMetricID2,$gaugeMetricID3] as $gaugeMetric) {
                   if ($gaugeMetric <> '') {
                     $pdo = get_pdo($cfg);
                     $stmt = $pdo->query("SELECT samples.value, metrics.name, metrics.unit FROM `samples` JOIN metrics on samples.metric_id = metrics.id where samples.metric_id = " . $gaugeMetric . " order by samples.ts DESC limit 1;");
                     $row = $stmt->fetch(PDO::FETCH_ASSOC);
                     echo '<div class="lm-gauge" id="lm-gauge-' . $gaugeMetric . '"></div>';
-                    echo '<script> new JustGage({id: "lm-gauge-' . $gaugeMetric . '", value: ' . $row['value'] . ', min: ' . $element['min'] . ', max: ' . $element['max'] . ', decimals: ' . $element['decimals'] .', title: "' . $row['name'] . '", label: "' . $row['unit'] . '" }); </script>';
+                    echo '<script> new JustGage({id: "lm-gauge-' . $gaugeMetric . '", value: ' . $row['value'] . ', min: ' . $element['min'] . ', max: ' . $element['max'] . ', decimals: ' .
+ $element['decimals'] .', title: "' . $row['name'] . '", label: "' . $row['unit'] . '", '. $standardgaugestyles .' }); </script>';
                   }
                 }
                 echo '</div>';
