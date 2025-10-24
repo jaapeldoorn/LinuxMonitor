@@ -136,7 +136,9 @@ catch (Throwable $e) {
                   default:
                     $str = 'Unknown element type: ' . $element['type'];
                 }
-                echo '<p>' . $element['pre_txt'] . '<b>' . $str . '</b>' . $element['post_txt'] .'</p>';
+                $strPreTxt = $element['pre_txt'] ?? '';
+                $strPostTxt = $element['post_txt'] ?? '';
+                echo '<p>' . $strPreTxt . '<b>' . $str . '</b>' . $strPostTxt .'</p>';
                 break;
               case 'gauge':
                 $gaugeMetricID1 = $element['ID1'] ?? '';
