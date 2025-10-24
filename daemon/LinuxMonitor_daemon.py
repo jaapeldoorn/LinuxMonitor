@@ -219,6 +219,11 @@ def main():
                                         set_last_value.close
                                     except Exception as e:
                                         logger.exception(f"Error during conversion type {m['modification']} with original value {value}: {e}")
+                                case 8: #Divide by 1024x1024 (from eg kb to Gb
+                                    try:
+                                        value = float(re_result[0]) / 1048576
+                                    except Exception as e:
+                                        logger.exception(f"Error during conversion type {m['modification']} with original value {value}")
                                 case 88: #Match Found/NotFound
                                     try:
                                         value = 'active'

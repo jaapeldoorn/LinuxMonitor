@@ -97,6 +97,7 @@ Various options are available to process data retrieved from the regex step. If 
 5. Substract 2 values and divide by 1024 (to calculate used memory from available memory and free memory)
 6. Calculate network trafic in bps
 7. Calculate network trafic in bps and make the number negative
+8. Divide by 1024x1024 (Conversion from kByte to GByte or Byte to MByte)
 88. Return 'active' in case the regex is found and 'inactive' is the regex is not found. (E.g. used to use with netstat -nlt to monitor wheter a service is listening on a port). The result is saved as a string in the txt-status table. Only the last value is available.
 99. Save the regex as a string in the txt-value table. Only the last status will be saved.
 ````
