@@ -221,7 +221,7 @@ def main():
                                         logger.exception(f"Error during conversion type {m['modification']} with original value {value}: {e}")
                                 case 88: #Match Found/NotFound
                                     try:
-                                        value = 'Active'
+                                        value = 'active'
                                     except Exception as e:
                                         logger.exception(f"Error during conversion type {m['modification']} with original value {value}")
                                 case 99: #Proces a string
@@ -242,6 +242,7 @@ def main():
                                 insert_cur.close()
                         else:
                             if m['modification']==88:
+                                value='inactive'
                                 insert_cur = db.conn.cursor()
                                 insert_cur.execute("INSERT INTO `txt-status`(metric_id, ts, string) VALUES (%s, %s, %s) ON DUPLICATE KEY UPDATE metric_id = %s, ts = %s, string = %s", (m['id'], now_ts(), value, m['id'], now_ts(), value))
                                 insert_cur.close()
