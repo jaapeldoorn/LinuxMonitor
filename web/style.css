@@ -80,6 +80,7 @@ button,select,input{
   border-radius:6px;
   line-height: 1.2em;
   font-size: 1rem;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif
   /*height: 36px;*/
 }
 button:hover{
