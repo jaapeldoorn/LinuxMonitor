@@ -68,6 +68,11 @@ foreach ($viewable_metrics as $metric) {
           <option value="360" <?= ($cfg['app']['default_minutes'] == 360) ? ' selected' : '' ?>>6 hours</option>
           <option value="1440" <?= ($cfg['app']['default_minutes'] == 1440) ? ' selected' : '' ?>>1 day</option>
           <option value="10080" <?= ($cfg['app']['default_minutes'] == 10080) ? ' selected' : '' ?>>1 week</option>
+          <option value="43200" <?= ($cfg['app']['default_minutes'] == 43200) ? ' selected' : '' ?>>1 month</option>
+          <option value="131500" <?= ($cfg['app']['default_minutes'] == 131500) ? ' selected' : '' ?>>3 months</option>
+          <option value="10080">1 year</option>
+          <option value="10080">2 years</option>
+          <option value="10080">5 years</option>
         </select>
       </label>
       <label>Server:

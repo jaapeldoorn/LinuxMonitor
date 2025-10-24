@@ -122,7 +122,7 @@ The view in which the data should be displayed. This is a number. The graphs wil
 The frequency that the daemon will run the command. The frequency of 1 will result in that the command will run every time. A freqency of 2 will result in a measurement in half of the cases. While a frequency of 10 will result in a measurement every 10 cycles.
 
 ### Samples table
-This table consists of 4 fields which all will be auto populated by the daemon:
+This table consists of 5 fields which all will be auto populated by the daemon:
 **id**
 An autonumbered field to identify unique records.
 
@@ -134,6 +134,9 @@ A date time field with the moment that this measurement was performed. This time
 
 **value**
 The outcome of the modified regex of the run command. This data will be plot in the trend graphs.
+
+**aggregated**
+This field is used during cleanup of this table. Default value is false.
 
 ### txt-status table
 This table consists of 3 fields which all will be auto populated by the daemon:
@@ -177,7 +180,16 @@ To avoid timezone problems this website will present the date in the configured 
 This parameter will hold the host\_label that will be loaded by default. This parameter will be stored in the following format: 'host\_label'.
 
 **default_minutes**
-This parameter will hold the default time window for the graphs onS the monitor page.
+This parameter will hold the default time window for the graphs on the monitor page. Valid options are:
+```
+60 for 1 hour
+360 for 6 hours
+1440 for 1 day
+10080 for 1 week
+43200 for 1 month
+131500 for 3 months
+```
+The other options (with a longer duration) are not possible to prevent server performance issues.
 
 ### Database related settings
 **host**
