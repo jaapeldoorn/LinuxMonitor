@@ -48,7 +48,7 @@ class DB:
 def main():
     # Get config
     parser = argparse.ArgumentParser()
-    parser.add_argument('--config', default='config.yaml', help='Path to configuration file')
+    parser.add_argument('--config', default='/etc/LinuxMonitor/daemon/config.yaml', help='Path to configuration file')
     args = parser.parse_args()
     with open(args.config, 'r') as f:
         cfg = yaml.safe_load(f)
