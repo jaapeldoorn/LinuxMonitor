@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS samples (
   metric_id INT NOT NULL,
   ts DATETIME(6) NOT NULL,
   value DOUBLE NOT NULL,
+  aggregated BOOLEAN NOT NULL DEFAULT FALSE,
   INDEX idx_metric_ts (metric_id, ts),
   CONSTRAINT fk_samples_metric FOREIGN KEY (metric_id) REFERENCES metrics(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
