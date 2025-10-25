@@ -6,7 +6,8 @@ return [
     'stat_refresh_seconds' => 40,    // refresh interval status UI in seconds
     'timezone' => 'Europe/Amsterdam',
     'default_device' => 'System1', // default device in monitoring UI
-    'default_minutes' => 10080, // default time window monitoring UI in minutes
+    'default_minutes' => 360, // default time window monitoring UI in minutes
+    'FontAwesomeID' => '01234556789', // personal ID from FontAwesome to use their collection
   ],
 
   // Database settings
@@ -15,57 +16,320 @@ return [
     'port' => 3306,
     'dbname' => 'linuxmonitor',
     'user' => 'linmon_reader',
-    'pass' => 'READerdg453rg43sg',
+    'pass' => 'WRITE31f34ert4ggs',
     'charset' => 'utf8mb4',
   ],
 
-  // Global display defaults
-  'defaults' => [
-    'decimals' => 1,
-    'thresholds' => [  // colors for default thresholds
-      ['upto' => 70, 'color' => '#2ecc71'], // green
-      ['upto' => 90, 'color' => '#f1c40f'], // yellow
-      ['color' => '#e74c3c'],               // red
-    ],
+  // Colors for labels
+  'labels' => [
+    'active' => 'bg-success',
+    'failed' => 'bg-danger',
+    'inactive' => 'bg-danger'
   ],
 
-  // Sections & cards
+  // Sections & elements
   'sections' => [
     [
-      'title' => 'System',
-      'columns' => 3, // columns in grid
-      'cards' => [
+      'title' => 'Version',
+      'logo' => 'logo.png',
+      'system' => 'all',
+      'elements' => [
         [
-          'metric_key' => 'System1.cpu.load15',
-          'type'       => 'gauge',     // text | progress | gauge | line
-          'label'      => 'Label1',
-          'unit'       => 'Unit1',
-          'min'        => 0,
-          'max'        => 1,
-          'decimals'   => 1,
-          'thresholds' => [
-            ['upto' => .60, 'color' => '#2ecc71'],
-            ['upto' => .80, 'color' => '#f39c12'],
-            ['color' => '#e74c3c'],
-          ],
+           'type' => 'text',
+           'vartype' => 'string',
+           'ID' => '57',
+           'pre_txt' => 'Model: ',
         ],
         [
-          'metric_key' => 'System1.cpu.load5',
-          'type'       => 'progress',
-          'label'      => 'Label2',
-          'unit'       => 'Unit2',
-          'min'        => 0,
-          'max'        => 100,
-          'decimals'   => 0,
+           'type' => 'text',
+           'vartype' => 'string',
+           'ID' => '54',
+           'pre_txt' => 'Distribution: ',
         ],
         [
-          'metric_key' => 'System1.cpu.load1',
-          'type'       => 'progress',
-          'label'      => 'Label3',
-          'unit'       => 'Unit3',
-          'min'        => 0,
-          'max'        => 100,
-          'decimals'   => 0,
+           'type' => 'text',
+           'vartype' => 'string',
+           'ID' => '55',
+           'pre_txt' => 'Kernel version: ',
+        ]
+      ]
+    ],
+    [
+      'title' => 'Packages',
+      'logo' => 'box-archive',
+      'system' => 'all',
+      'elements' => [
+        [
+           'type' => 'subtitle',
+           'txt' => 'Upgrade'
+        ],
+        [
+           'type' => 'package',
+           'source' => 'RaspiServ3_upgrade.txt',
+           'pre_txt' => 'Upgrade',
+           'post_txt' => 'packages'
+        ],
+        [
+           'type' => 'subtitle',
+           'txt' => 'Autoremove'
+        ],
+        [
+           'type' => 'package',
+           'source' => 'RaspiServ3_autoremove.txt',
+           'pre_txt' => 'Autoremove',
+           'post_txt' => 'packages'
+        ]
+      ]
+    ],
+    [
+      'title' => 'Uptime',
+      'logo' => 'stopwatch',
+      'system' => 'all',
+      'elements' => [
+        [
+           'type' => 'text',
+           'vartype' => 'float',
+           'decimals' => 1,
+           'ID' => '58',
+           'pre_txt' => 'Uptime: ',
+           'post_txt' => ' days'
+        ]
+      ]
+    ],
+    [
+      'title' => 'CPU',
+      'logo' => 'microchip',
+      'system' => 'all',
+      'elements' => [
+        [
+           'type' => 'gauge',
+           'ID1' => '109',
+           'ID2' => '110',
+           'ID3' => '111',
+           'min' => '0',
+           'max' => '5',
+           'decimals' => 2
+        ],
+        [
+           'type' => 'text',
+           'vartype' => 'float',
+           'decimals' => 0,
+           'ID' => '59',
+           'pre_txt' => 'CPU frequency: ',
+           'post_txt' => 'MHz'
+        ],
+        [
+           'type' => 'text',
+           'vartype' => 'float',
+           'decimals' => 2,
+           'ID' => '60',
+           'pre_txt' => 'CPU voltage: ',
+           'post_txt' => 'V'
+        ]
+      ]
+    ],
+    [
+      'title' => 'Temperature',
+      'logo' => 'temperature-high',
+      'system' => 'all',
+      'elements' => [
+        [
+           'type' => 'gauge',
+           'ID1' => '63',
+           'min' => '20',
+           'max' => '80',
+           'decimals' => 0
+        ]
+      ]
+    ],
+    [
+      'title' => 'Memory',
+      'logo' => 'memory.png',
+      'system' => 'all',
+      'elements' => [
+        [
+           'type' => 'UFT-string',
+           'ID-used' => '117',
+           'ID-total' => '65',
+           'decimals' => 0,
+        ],
+        [
+           'type' => 'bar',
+           'ID-part' => '67',
+           'ID-total' => '65'
+        ]
+      ]
+    ],
+    [
+      'title' => 'Swap',
+      'logo' => 'rotate',
+      'system' => 'all',
+      'elements' => [
+        [
+           'type' => 'UFT-string',
+           'ID-used' => '69',
+           'ID-total' => '68',
+           'decimals' => 0,
+        ],
+        [
+           'type' => 'bar',
+           'ID-part' => '69',
+           'ID-total' => '68'
+        ]
+      ]
+    ],
+    [
+      'title' => 'SD card',
+      'logo' => 'sd-card',
+      'system' => 'all',
+      'elements' => [
+        [
+           'type' => 'subtitle',
+           'txt' => 'SD card'
+        ],
+        [
+           'type' => 'UFT-string',
+           'ID-used' => '71',
+           'ID-total' => '70',
+           'decimals' => 2,
+        ],
+        [
+           'type' => 'bar',
+           'ID-part' => '71',
+           'ID-total' => '70'
+        ]
+      ]
+    ],
+    [
+      'title' => 'Storage',
+      'logo' => 'database',
+      'system' => 'all',
+      'elements' => [
+        [
+           'type' => 'subtitle',
+           'txt' => 'Root'
+        ],
+        [
+           'type' => 'UFT-string',
+           'ID-used' => '75',
+           'ID-total' => '73',
+           'decimals' => 1,
+        ],
+        [
+           'type' => 'bar',
+           'ID-part' => '75',
+           'ID-total' => '73'
+        ],
+        [
+           'type' => 'subtitle',
+           'txt' => 'myNAS'
+        ],
+        [
+           'type' => 'UFT-string',
+           'ID-used' => '77',
+           'ID-total' => '76',
+           'decimals' => 1,
+        ],
+        [
+           'type' => 'bar',
+           'ID-part' => '77',
+           'ID-total' => '76'
+        ],
+        [
+           'type' => 'subtitle',
+           'txt' => 'piNAS'
+        ],
+        [
+           'type' => 'UFT-string',
+           'ID-used' => '74',
+           'ID-total' => '72',
+           'decimals' => 1,
+        ],
+        [
+           'type' => 'bar',
+           'ID-part' => '74',
+           'ID-total' => '72'
+        ]
+      ]
+    ],
+    [
+      'title' => 'Ethernet',
+      'logo' => 'network-wired',
+      'system' => 'all',
+      'elements' => [
+        [
+           'type' => 'gauge',
+           'ID1' => '34',
+           'ID2' => '35',
+           'min' => '0',
+           'max' => '100000',
+           'decimals' => 0
+        ],
+      ]
+    ],
+    [
+      'title' => 'WiFi',
+      'logo' => 'wifi',
+      'system' => 'all',
+      'elements' => [
+        [
+           'type' => 'gauge',
+           'ID1' => '78',
+           'ID2' => '79',
+           'min' => '0',
+           'max' => '100000',
+           'decimals' => 0
+        ],
+      ]
+    ],
+    [
+      'title' => 'WiFi2',
+      'logo' => 'wifi',
+      'system' => 'dummy'
+    ],
+    [
+      'title' => 'Servers',
+      'logo' => 'arrow-up-right-from-square',
+      'system' => 'RaspiServ3',
+      'elements' => [
+        [
+           'type' => 'badge',
+           'ID' => '80'
+        ],
+        [
+           'type' => 'badge',
+           'ID' => '82'
+        ],
+        [
+           'type' => 'badge',
+           'ID' => '92'
+        ],
+        [
+           'type' => 'badge',
+           'ID' => '93'
+        ]
+      ]
+    ],
+    [
+      'title' => 'Services',
+      'logo' => 'arrow-right-to-bracket',
+      'system' => 'RaspiServ3',
+      'elements' => [
+        [
+           'type' => 'badge',
+           'ID' => '96'
+        ],
+        [
+           'type' => 'badge',
+           'ID' => '97'
+        ],
+        [
+           'type' => 'badge',
+           'ID' => '107'
+        ],
+        [
+           'type' => 'badge',
+           'ID' => '108'
         ],
       ],
     ],

@@ -25,7 +25,8 @@ FLUSH PRIVILEGES;
 ```
 Create tables with following command:
 ```bash
-mysql -u root -p rpimonitor < /etc/LinuxMonitor/install/scheme.sql
+sudo su
+mysql < /etc/LinuxMonitor/install/scheme.sql
 ```
 
 ## Python Daemon
