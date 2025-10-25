@@ -161,7 +161,27 @@ catch (Throwable $e) {
                 echo '</div>';
                 break;
               case 'package':
-                echo '<p>PACKAGE placeholder</p>';
+                $file = './apt/' . $element['source'];
+                $strPreTxt = $element['pre_txt'] ?? '';
+                $strPostTxt = $element['post_txt'] ?? '';
+                // Check file existence
+                if (file_exists($file)) {
+                  if ($strPreTxt <> ""){echo '<p style="text-align: center;">' .$strPreTxt . '</p>';}
+                  $lines = file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+                  $count = count($lines);
+                  echo '<p style="text-align: center; font-size: 36px;">' . $count . '</p>';
+                  if ($strPostTxt <> ""){echo '<p style="text-align: center;">' .$strPostTxt . '</p>';}
+                  echo '<ul>';
+
+                  // display all lines
+                  foreach ($lines as $line) {
+                    echo '<li>' . htmlspecialchars($line) . '</li>';
+                  }
+                  echo '</ul>';
+                } else {
+                  echo '<p>File not '. $file . ' found</p>';
+                }
+                break;
               default:
                 echo '<p>Unknown element type: ' . $element['type'] . '</p>';
             }
