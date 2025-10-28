@@ -50,14 +50,13 @@ try {
     </div>
   </header>
   <section class="lm-menu">
-    <label>Server IS NOT WORKING:
+    <label>Server:
       <select id="device">
         <?php foreach ($devicelist as $d) : ?>
           <option value="<?= htmlspecialchars($d['prefix']) ?>" <?= ($d['prefix'] === $cfg['app']['default_device']) ? ' selected' : '' ?>><?= htmlspecialchars($d['prefix']) ?></option>
         <?php endforeach; ?>
       </select>
     </label>
-    <button id="refresh">Refresh</button>
     <label><input type="checkbox" id="autorefresh" data-interval=" <?= $cfg['app']['mon_refresh_seconds'] ?> " checked /> Auto-refresh (<?= $cfg['app']['mon_refresh_seconds'] ?>s)</label>
   </section>
   <main>
@@ -204,23 +203,19 @@ try {
   <script src="autorefresh.js"></script>
   <script>
     function update() {
-      console.log('Device changed, updating display...');
       const selected = this.value;
-      console.log('Selected device: ' + selected);
       const divs = document.querySelectorAll('div[system]');
-      console.log('Found ' + divs.length + ' divs with system attribute.');
       divs.forEach(div => {
         const sys = div.getAttribute('system');
         console.log('div: ' + div + ', system: ' + sys);
         if (sys === 'all' || sys === selected) {
-          div.style.display = ''; // tonen
+          div.style.display = '';
         } else {
-          div.style.display = 'none'; // verbergen
+          div.style.display = 'none';
         }
       });
     }
     document.getElementById('device').addEventListener('change', update);
-    // Initiale weergave bij laden
     document.getElementById('device').dispatchEvent(new Event('change'));
   </script>
   <script>
