@@ -8,10 +8,9 @@ try {
   $pdo = get_pdo($cfg);
   $stmt = $pdo->query("SELECT DISTINCT SUBSTRING_INDEX(`keystr`, '.', 1) AS prefix FROM metrics");
   $devicelist = $stmt->fetchAll();
-  }
-catch (Throwable $e) {
+} catch (Throwable $e) {
   $devicelist = [];
-  }
+}
 
 ?>
 <!doctype html>
@@ -25,12 +24,12 @@ catch (Throwable $e) {
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
 
-<?php
+  <?php
   $fontAwesomeID = $config['app']['FontAwesomeID'] ?? '';
   if ($fontAwesomeID <> '') {
     echo '  <script src="https://kit.fontawesome.com/' . $fontAwesomeID . '.js" crossorigin="anonymous"></script>';
   }
-?>
+  ?>
   <script src="https://unpkg.com/justgage@latest/dist/justgage.umd.js"></script>
 </head>
 
@@ -46,8 +45,8 @@ catch (Throwable $e) {
       </div>
     </div>
     <div class="lm-page-button">
-      <img src="./img/gauge.svg" class="icon active"/>
-      <a href="monitor.php"><img src="./img/chart-line.svg" class="icon inactive"/></a>
+      <img src="./img/gauge.svg" class="icon active" />
+      <a href="monitor.php"><img src="./img/chart-line.svg" class="icon inactive" /></a>
     </div>
   </header>
   <section class="lm-menu">
@@ -63,132 +62,140 @@ catch (Throwable $e) {
   </section>
   <main>
     <div class="lm-columns">
-   <?php foreach ($cfg['sections'] as $sIndex => $section):
-     echo '<div class="lm-section" section="' . $section['system'] . '">';
-     echo '<div class="lm-section-title">';
-     $logo = htmlspecialchars($section['logo'] ?? 'NoLogo');
-     if (strpos($logo, '.') !== false) {
-       echo '<img src="img/' . $logo . '" alt="Logo">';
-     } else {
-       // Geen punt, dus waarschijnlijk een Font Awesome icoon
-       echo '<i class="fa-solid fa-2x fa-' . $logo . '"></i>';
-     }
-     echo htmlspecialchars($section['title'] ?? 'NoSectionTitle');
+      <?php foreach ($cfg['sections'] as $sIndex => $section):
+        echo '<div class="lm-section" system="' . $section['system'] . '">';
+        echo '<div class="lm-section-title">';
+        $logo = htmlspecialchars($section['logo'] ?? 'NoLogo');
+        if (strpos($logo, '.') !== false) {
+          echo '<img src="img/' . $logo . '" alt="Logo">';
+        } else {
+          // Geen punt, dus waarschijnlijk een Font Awesome icoon
+          echo '<i class="fa-solid fa-2x fa-' . $logo . '"></i>';
+        }
+        echo htmlspecialchars($section['title'] ?? 'NoSectionTitle');
         echo '</div>';
         echo '<div class="lm-section-text">';
-          foreach (($section['elements'] ?? []) as $cIndex => $element):
-            switch ($element['type']){
-              case 'badge':
-                $pdo = get_pdo($cfg);
-                $stmt = $pdo->query("SELECT `txt-status`.string, metrics.name FROM `txt-status` JOIN metrics on `txt-status`.metric_id = metrics.id where `txt-status`.metric_id = " . $element['ID']);
-                $row = $stmt->fetch(PDO::FETCH_ASSOC);
-                $badgecolor = $cfg['labels'][$row['string']] ?? '';
-                if ($badgecolor == ''){
-                  $badgecolor = 'bg-primary';
-                }
-                echo '<p><span class="badge ' . $badgecolor . '">' .  $row['string'] . '</span> '. $row['name'].'</p>';
-                break;
-              case 'UFT-string':
-                $pdo = get_pdo($cfg);
-                $stmt = $pdo->query("SELECT samples.value, metrics.unit FROM `samples` JOIN metrics on samples.metric_id = metrics.id where samples.metric_id = " . $element['ID-used'] . " order by samples.ts DESC limit 1;");
-                $row = $stmt->fetch(PDO::FETCH_ASSOC);
-                $used = $row['value'];
-                $unit = $row['unit'];
-                $stmt = $pdo->query("SELECT value FROM `samples` where metric_id = " . $element['ID-total'] . " order by ts DESC limit 1;");
-                $row = $stmt->fetch(PDO::FETCH_ASSOC);
-                $total = $row['value'];
-                $free = $total - $used;
-                echo '<p>Used: <b>' . round($used,$element['decimals']) . $unit  . '</b> | Free: <b>' . round($free,$element['decimals']) . $unit .'</b> | Total: <b>' . round($total,$element['decimals']) . $unit . '</b></p>';
-                break;
-              case 'subtitle':
-                echo '<p><b>' . $element['txt'] . '</b></p>';
-                break;
-              case 'bar':
-                $pdo = get_pdo($cfg);
-                $stmt = $pdo->query("SELECT value FROM `samples` where metric_id = " . $element['ID-part'] . " order by ts DESC limit 1;");
-                $row = $stmt->fetch(PDO::FETCH_ASSOC);
-                $part = $row['value'];
-                $stmt = $pdo->query("SELECT value FROM `samples` where metric_id = " . $element['ID-total'] . " order by ts DESC limit 1;");
-                $row = $stmt->fetch(PDO::FETCH_ASSOC);
-                $total = $row['value'];
-                $fraction = $part / $total * 100;
-                echo '<div class="progress" style="height:20px">';
-                echo '<div class="progress-bar" style="width:' . $fraction . '%">' . round($fraction) . '%</div>';
-                echo '</div>';
-                break;
-              case 'text':
-                switch ($element['vartype']){
-                  case 'string':
-                    $pdo = get_pdo($cfg);
-                    $stmt = $pdo->query("SELECT string FROM `txt-status` where metric_id = " . $element['ID'] . ";");
-                    $row = $stmt->fetch(PDO::FETCH_ASSOC);
-                    if ($row) {$str = htmlspecialchars($row['string']);} else {$str = "No record found";}
-                    break;
-                  case 'float':
-                    $pdo = get_pdo($cfg);
-                    $stmt = $pdo->query("SELECT value FROM `samples` where metric_id = " . $element['ID'] . " order by ts DESC limit 1;");
-                    $row = $stmt->fetch(PDO::FETCH_ASSOC);
-                    if (is_numeric($element['decimals'] ?? '0')) {
-                      if ($row) {
-                        $str = round($row['value'], (int)$element['decimals']);
-                      } else {
-                        $str = "No record found";
-                      }
+        foreach (($section['elements'] ?? []) as $cIndex => $element):
+          switch ($element['type']) {
+            case 'badge':
+              $pdo = get_pdo($cfg);
+              $stmt = $pdo->query("SELECT `txt-status`.string, metrics.name FROM `txt-status` JOIN metrics on `txt-status`.metric_id = metrics.id where `txt-status`.metric_id = " . $element['ID']);
+              $row = $stmt->fetch(PDO::FETCH_ASSOC);
+              $badgecolor = $cfg['labels'][$row['string']] ?? '';
+              if ($badgecolor == '') {
+                $badgecolor = 'bg-primary';
+              }
+              echo '<p><span class="badge ' . $badgecolor . '">' .  $row['string'] . '</span> ' . $row['name'] . '</p>';
+              break;
+            case 'UFT-string':
+              $pdo = get_pdo($cfg);
+              $stmt = $pdo->query("SELECT samples.value, metrics.unit FROM `samples` JOIN metrics on samples.metric_id = metrics.id where samples.metric_id = " . $element['ID-used'] . " order by samples.ts DESC limit 1;");
+              $row = $stmt->fetch(PDO::FETCH_ASSOC);
+              $used = $row['value'];
+              $unit = $row['unit'];
+              $stmt = $pdo->query("SELECT value FROM `samples` where metric_id = " . $element['ID-total'] . " order by ts DESC limit 1;");
+              $row = $stmt->fetch(PDO::FETCH_ASSOC);
+              $total = $row['value'];
+              $free = $total - $used;
+              echo '<p>Used: <b>' . round($used, $element['decimals']) . $unit  . '</b> | Free: <b>' . round($free, $element['decimals']) . $unit . '</b> | Total: <b>' . round($total, $element['decimals']) . $unit . '</b></p>';
+              break;
+            case 'subtitle':
+              echo '<p><b>' . $element['txt'] . '</b></p>';
+              break;
+            case 'bar':
+              $pdo = get_pdo($cfg);
+              $stmt = $pdo->query("SELECT value FROM `samples` where metric_id = " . $element['ID-part'] . " order by ts DESC limit 1;");
+              $row = $stmt->fetch(PDO::FETCH_ASSOC);
+              $part = $row['value'];
+              $stmt = $pdo->query("SELECT value FROM `samples` where metric_id = " . $element['ID-total'] . " order by ts DESC limit 1;");
+              $row = $stmt->fetch(PDO::FETCH_ASSOC);
+              $total = $row['value'];
+              $fraction = $part / $total * 100;
+              echo '<div class="progress" style="height:20px">';
+              echo '<div class="progress-bar" style="width:' . $fraction . '%">' . round($fraction) . '%</div>';
+              echo '</div>';
+              break;
+            case 'text':
+              switch ($element['vartype']) {
+                case 'string':
+                  $pdo = get_pdo($cfg);
+                  $stmt = $pdo->query("SELECT string FROM `txt-status` where metric_id = " . $element['ID'] . ";");
+                  $row = $stmt->fetch(PDO::FETCH_ASSOC);
+                  if ($row) {
+                    $str = htmlspecialchars($row['string']);
+                  } else {
+                    $str = "No record found";
+                  }
+                  break;
+                case 'float':
+                  $pdo = get_pdo($cfg);
+                  $stmt = $pdo->query("SELECT value FROM `samples` where metric_id = " . $element['ID'] . " order by ts DESC limit 1;");
+                  $row = $stmt->fetch(PDO::FETCH_ASSOC);
+                  if (is_numeric($element['decimals'] ?? '0')) {
+                    if ($row) {
+                      $str = round($row['value'], (int)$element['decimals']);
+                    } else {
+                      $str = "No record found";
                     }
-                    break;
-                  default:
-                    $str = 'Unknown element type: ' . $element['type'];
-                }
-                $strPreTxt = $element['pre_txt'] ?? '';
-                $strPostTxt = $element['post_txt'] ?? '';
-                echo '<p>' . $strPreTxt . '<b>' . $str . '</b>' . $strPostTxt .'</p>';
-                break;
-              case 'gauge':
-                $gaugeMetricID1 = $element['ID1'] ?? '';
-                $gaugeMetricID2 = $element['ID2'] ?? '';
-                $gaugeMetricID3 = $element['ID3'] ?? '';
-                echo '<div class="lm-gauges">';
-                $standardgaugestyles = 'valueFontColor: "#FFFFFF"';
-                foreach ([$gaugeMetricID1,$gaugeMetricID2,$gaugeMetricID3] as $gaugeMetric) {
-                  if ($gaugeMetric <> '') {
-                    $pdo = get_pdo($cfg);
-                    $stmt = $pdo->query("SELECT samples.value, metrics.name, metrics.unit FROM `samples` JOIN metrics on samples.metric_id = metrics.id where samples.metric_id = " . $gaugeMetric . " order by samples.ts DESC limit 1;");
-                    $row = $stmt->fetch(PDO::FETCH_ASSOC);
-                    echo '<div class="lm-gauge" id="lm-gauge-' . $gaugeMetric . '"></div>';
-                    echo '<script> new JustGage({id: "lm-gauge-' . $gaugeMetric . '", value: ' . $row['value'] . ', min: ' . $element['min'] . ', max: ' . $element['max'] . ', decimals: ' . $element['decimals'] .', title: "' . $row['name'] . '", label: "' . $row['unit'] . '", '. $standardgaugestyles .' }); </script>';
                   }
+                  break;
+                default:
+                  $str = 'Unknown element type: ' . $element['type'];
+              }
+              $strPreTxt = $element['pre_txt'] ?? '';
+              $strPostTxt = $element['post_txt'] ?? '';
+              echo '<p>' . $strPreTxt . '<b>' . $str . '</b>' . $strPostTxt . '</p>';
+              break;
+            case 'gauge':
+              $gaugeMetricID1 = $element['ID1'] ?? '';
+              $gaugeMetricID2 = $element['ID2'] ?? '';
+              $gaugeMetricID3 = $element['ID3'] ?? '';
+              echo '<div class="lm-gauges">';
+              $standardgaugestyles = 'valueFontColor: "#FFFFFF"';
+              foreach ([$gaugeMetricID1, $gaugeMetricID2, $gaugeMetricID3] as $gaugeMetric) {
+                if ($gaugeMetric <> '') {
+                  $pdo = get_pdo($cfg);
+                  $stmt = $pdo->query("SELECT samples.value, metrics.name, metrics.unit FROM `samples` JOIN metrics on samples.metric_id = metrics.id where samples.metric_id = " . $gaugeMetric . " order by samples.ts DESC limit 1;");
+                  $row = $stmt->fetch(PDO::FETCH_ASSOC);
+                  echo '<div class="lm-gauge" id="lm-gauge-' . $gaugeMetric . '"></div>';
+                  echo '<script> new JustGage({id: "lm-gauge-' . $gaugeMetric . '", value: ' . $row['value'] . ', min: ' . $element['min'] . ', max: ' . $element['max'] . ', decimals: ' . $element['decimals'] . ', title: "' . $row['name'] . '", label: "' . $row['unit'] . '", ' . $standardgaugestyles . ' }); </script>';
                 }
-                echo '</div>';
-                break;
-              case 'package':
-                $file = './apt/' . $element['source'];
-                $strPreTxt = $element['pre_txt'] ?? '';
-                $strPostTxt = $element['post_txt'] ?? '';
-                // Check file existence
-                if (file_exists($file)) {
-                  if ($strPreTxt <> ""){echo '<p style="text-align: center;">' .$strPreTxt . '</p>';}
-                  $lines = file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-                  $count = count($lines);
-                  echo '<p style="text-align: center; font-size: 36px;">' . $count . '</p>';
-                  if ($strPostTxt <> ""){echo '<p style="text-align: center;">' .$strPostTxt . '</p>';}
-                  echo '<ul>';
+              }
+              echo '</div>';
+              break;
+            case 'package':
+              $file = './apt/' . $element['source'];
+              $strPreTxt = $element['pre_txt'] ?? '';
+              $strPostTxt = $element['post_txt'] ?? '';
+              // Check file existence
+              if (file_exists($file)) {
+                if ($strPreTxt <> "") {
+                  echo '<p style="text-align: center;">' . $strPreTxt . '</p>';
+                }
+                $lines = file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+                $count = count($lines);
+                echo '<p style="text-align: center; font-size: 36px;">' . $count . '</p>';
+                if ($strPostTxt <> "") {
+                  echo '<p style="text-align: center;">' . $strPostTxt . '</p>';
+                }
+                echo '<ul>';
 
-                  // display all lines
-                  foreach ($lines as $line) {
-                    echo '<li>' . htmlspecialchars($line) . '</li>';
-                  }
-                  echo '</ul>';
-                } else {
-                  echo '<p>File not '. $file . ' found</p>';
+                // display all lines
+                foreach ($lines as $line) {
+                  echo '<li>' . htmlspecialchars($line) . '</li>';
                 }
-                break;
-              default:
-                echo '<p>Unknown element type: ' . $element['type'] . '</p>';
-            }
-          endforeach;
+                echo '</ul>';
+              } else {
+                echo '<p>File not ' . $file . ' found</p>';
+              }
+              break;
+            default:
+              echo '<p>Unknown element type: ' . $element['type'] . '</p>';
+          }
+        endforeach;
         echo '</div>';
-      echo '</div>';
-    endforeach; ?>
+        echo '</div>';
+      endforeach; ?>
 
     </div>
     <div class="muted">Last update: <span id="lastUpdate">—</span></div>
@@ -196,20 +203,25 @@ catch (Throwable $e) {
 
   <script src="autorefresh.js"></script>
   <script>
-    document.getElementById('device').addEventListener('change', function () {
+    function update() {
+      console.log('Device changed, updating display...');
       const selected = this.value;
+      console.log('Selected device: ' + selected);
       const divs = document.querySelectorAll('div[system]');
+      console.log('Found ' + divs.length + ' divs with system attribute.');
       divs.forEach(div => {
         const sys = div.getAttribute('system');
+        console.log('div: ' + div + ', system: ' + sys);
         if (sys === 'all' || sys === selected) {
-            div.style.display = ''; // tonen
+          div.style.display = ''; // tonen
         } else {
-            div.style.display = 'none'; // verbergen
+          div.style.display = 'none'; // verbergen
         }
       });
-    });
+    }
+    document.getElementById('device').addEventListener('change', update);
     // Initiale weergave bij laden
-   document.getElementById('device').dispatchEvent(new Event('change'));
+    document.getElementById('device').dispatchEvent(new Event('change'));
   </script>
   <script>
     const REFRESH_MS = <?= (int)($cfg['app']['refresh_seconds'] ?? 10) ?> * 1000;
