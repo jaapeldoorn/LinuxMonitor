@@ -130,8 +130,12 @@ async function loadAll(){
 }
 
 function setup(){
-  //Refresh button
+  //menu selectors change
   document.getElementById('refresh').addEventListener('click', loadAll);
+  document.getElementById('device').addEventListener('change', loadAll);
+  document.getElementById('device').dispatchEvent(new Event('change'));
+  document.getElementById('range').addEventListener('change', loadAll);
+  document.getElementById('range').dispatchEvent(new Event('change'));
   //Autorefresh checkbox
   const checkbox = document.getElementById('autorefresh');
   const refreshInterval = parseInt(checkbox.dataset.interval, 10) * 1000;

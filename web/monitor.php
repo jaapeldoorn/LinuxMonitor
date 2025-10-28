@@ -83,7 +83,6 @@ foreach ($viewable_metrics as $metric) {
         <?php endforeach; ?>
       </select>
     </label>
-    <button id="refresh">Refresh</button>
     <label><input type="checkbox" id="autorefresh" data-interval=" <?= $cfg['app']['mon_refresh_seconds'] ?> " checked /> Auto-refresh (<?= $cfg['app']['mon_refresh_seconds'] ?>s)</label>
   </section>
   <main>
