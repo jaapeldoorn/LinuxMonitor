@@ -339,7 +339,8 @@ The *ID* presents the record ID in the metrics table for the parameter measured.
 The colors of the values are already defined above in the Colors for batches section of the configuration file.
 
 #### bar
-
+The bar element displays a horizonal bar chart. This element can be used to display e.g. the fraction of a storage that is used.
+The configuration of the bar consist besides the type two IDs:
 ```
         [
            'type' => 'bar',
@@ -347,9 +348,10 @@ The colors of the values are already defined above in the Colors for batches sec
            'ID-total' => '65'
         ],
 ```
+The *ID-total* refers to the metric ID which stores the maximum of the bar chart. The *ID-part* is the ID of the metric that stores the value of the fraction that should be visualized.
 
 #### gauge
-
+If the preference is to present a value in a gauge the gauge element can be used. The configuration of a gauge is as follows:
 ```
         [
            'type' => 'gauge',
@@ -361,9 +363,13 @@ The colors of the values are already defined above in the Colors for batches sec
            'decimals' => 2
         ],
 ```
+A maximum of 3 gauges can be placed on one row. If only one or two gauges on a row has to be visualised the ID2 and ID3 for the second and third graph can be removed respectively.
+The *ID1*, *ID2*, *ID3* are the metric IDs of the value that should be shown in respectively the first, second and third gauge.
+The *min* and *max* are respectively the minimal and maximal values in the gauge. 
+The *decimals* indicates with how many decimals the value should be presented in the gauge.
 
 #### UFT-string
-
+To display the Used, Free and Total amound of a storage device the UFT-string can be used. The UFT string consists of the following elements:
 ```
         [
            'type' => 'UFT-string',
@@ -372,9 +378,18 @@ The colors of the values are already defined above in the Colors for batches sec
            'decimals' => 0,
         ],
 ```
+The *ID-used* is a reference to the metric ID that hold the information how much storage is in use on that device. The *ID-total* is a reference to the metric ID that stored the total storage capacity of the device.
 
 #### package
-
+To display the number of software packages and the relevant package names the package element can be used. To use this functionality a periodic run of `/etc/LinuxMonitor/daemon/apd-dump.sh` should be executed via `cron` or an alternative. The file consist of the following lines:
+```
+#!/bin/bash
+sudo aptitude update
+sudo aptitude -F%p --disable-columns search ~U > /etc/LinuxMonitor/web/apt/RaspiServ3_upgrade.txt
+sudo aptitude -F%p --disable-columns search ~o > /etc/LinuxMonitor/web/apt/RaspiServ3_autoremove.txt
+```
+The last two lines write the packages that should be (U) updated to the file `/etc/LinuxMonitor/web/apt/RaspiServ3_upgrade.txt` and the packages that can be autoremoved (o) to de file `/etc/LinuxMonitor/web/apt/RaspiServ3_autoremove.txt`. The filenames can be changed as long as they stay in the orignal folder.
+The package elements consists of the following config:
 ```
         [
            'type' => 'package',
@@ -383,3 +398,10 @@ The colors of the values are already defined above in the Colors for batches sec
            'post_txt' => 'packages'
         ],
 ```
+The *source* is the reference to the filename as configured in the script mentioned above.
+The *pre_txt* and *post_txt* are strings that are displayed respectively before and after the total number of packages that need to be configured.
+
+---
+
+I hope this helps the configuration. Don't hesitate to reach out in case of any questions.
+jaapeldoorn
