@@ -131,7 +131,7 @@ async function loadAll(){
 
 function setup(){
   //menu selectors change
-  document.getElementById('refresh').addEventListener('click', loadAll);
+  document.getElementById('autorefresh').addEventListener('click', loadAll);
   document.getElementById('device').addEventListener('change', loadAll);
   document.getElementById('device').dispatchEvent(new Event('change'));
   document.getElementById('range').addEventListener('change', loadAll);
