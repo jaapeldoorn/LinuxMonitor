@@ -1,3 +1,5 @@
+![GitHub last commit](https://img.shields.io/github/last-commit/jaapeldoorn/LinuxMonitor)
+
 # LinuxMonitor
 Real time monitoring for Linux systems based on the excellent tool of Xavier Berger (https://github.com/XavierBerger/RPi-Monitor). Since Xavier was not able to maintain RPi-monitor since it last release in 2017 that piece of software is outdated. With LinuxMonitor there is an up-to date version of a real time monitoring system for Linux kernels.
 
